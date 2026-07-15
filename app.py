@@ -136,7 +136,7 @@ def generate_checklist_image():
                     # Draw empty checkbox
                     draw.rounded_rectangle([box_x, box_y, box_x + box_size, box_y + box_size], radius=4, outline="#A0A0B0", width=2)
                 
-                # Draw text
+                # Draw text (without drag handle characters in exported image)
                 text_x = box_x + box_size + 20
                 text_color = "#FFFFFF" if not is_checked else "#A0A0B0"
                 draw.text((text_x, curr_y), item, fill=text_color, font=font_item)
@@ -282,16 +282,16 @@ def main():
         cat_total = sum(len(items) for items in category_data.values())
         cat_checked = sum(1 for items in category_data.values() for item in items if item in st.session_state.checked_items)
         
-        # Expander with live progress label
-        expander_title = f"{category} ({cat_checked} / {cat_total})"
+        # Expander with live progress label and visual drag handle prefix
+        expander_title = f"⠿ {category} ({cat_checked} / {cat_total})"
         
         with st.expander(expander_title, expanded=False):
             for subheader, items in category_data.items():
                 if subheader:
-                    st.markdown(f"**— {subheader}**")
+                    st.markdown(f"**⠿ — {subheader}**")
                 for item in items:
                     is_checked = item in st.session_state.checked_items
-                    label = f"↳ {item}" if subheader else item
+                    label = f"⠿ ↳ {item}" if subheader else f"⠿ {item}"
                     changed = st.checkbox(label, value=is_checked, key=item)
                     
                     if changed and not is_checked:

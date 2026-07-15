@@ -210,7 +210,7 @@
             padding: 24px;
             border-top: 1px solid var(--border-color);
             transition: max-height 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease;
-            max-height: 1200px;
+            max-height: 1500px;
             opacity: 1;
         }
 
@@ -227,6 +227,38 @@
             transform: rotate(-180deg);
         }
 
+        /* Drag and Drop Aesthetics */
+        .drag-handle {
+            color: var(--text-sub);
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.3;
+            transition: var(--transition);
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .drag-handle:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .category-drag-handle {
+            margin-right: 12px;
+        }
+
+        .item-drag-handle {
+            margin-right: 12px;
+        }
+
+        .dragging {
+            opacity: 0.4;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1.5px dashed var(--primary) !important;
+        }
+
         .checklist-list {
             display: flex;
             flex-direction: column;
@@ -240,6 +272,7 @@
             cursor: pointer;
             padding: 6px 0;
             user-select: none;
+            transition: background-color 0.2s ease;
         }
 
         /* Custom Checkbox Design */
@@ -419,14 +452,107 @@
     const savedItems = JSON.parse(localStorage.getItem('fujirock_checked_items') || '[]');
     let checkedItems = new Set(savedItems.filter(item => allPackingItems.has(item)));
 
-    // Load collapsed preference from localStorage, default all collapsed on first run
-    const hasCollapsedPref = localStorage.getItem('fujirock_collapsed_categories');
-    let collapsedCategories;
-    if (hasCollapsedPref === null) {
-        collapsedCategories = new Set(Object.keys(packingList));
-        localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
-    } else {
-        collapsedCategories = new Set(JSON.parse(hasCollapsedPref));
+    // Load collapsed preference from localStorage
+    let collapsedCategories = new Set(JSON.parse(localStorage.getItem('fujirock_collapsed_categories') || '[]'));
+
+    // Drag and Drop Logic
+    let dragSourceEl = null;
+
+    function handleDragStart(e) {
+        dragSourceEl = this;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        const draggingEl = document.querySelector('.dragging');
+        if (!draggingEl) return;
+        
+        if (draggingEl.classList.contains('category-card') && this.classList.contains('category-card')) {
+            const parent = this.parentNode;
+            const children = Array.from(parent.children);
+            const sourceIndex = children.indexOf(draggingEl);
+            const targetIndex = children.indexOf(this);
+            if (sourceIndex < targetIndex) {
+                parent.insertBefore(draggingEl, this.nextSibling);
+            } else {
+                parent.insertBefore(draggingEl, this);
+            }
+        } else if ((draggingEl.classList.contains('checklist-item') || draggingEl.classList.contains('checklist-subheader')) && 
+                   (this.classList.contains('checklist-item') || this.classList.contains('checklist-subheader'))) {
+            if (draggingEl.parentNode === this.parentNode) {
+                const parent = this.parentNode;
+                const children = Array.from(parent.children);
+                const sourceIndex = children.indexOf(draggingEl);
+                const targetIndex = children.indexOf(this);
+                if (sourceIndex < targetIndex) {
+                    parent.insertBefore(draggingEl, this.nextSibling);
+                } else {
+                    parent.insertBefore(draggingEl, this);
+                }
+            }
+        }
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        this.setAttribute('draggable', 'false');
+        saveCurrentOrder();
+    }
+
+    // Save custom category and items layout order to localStorage
+    function saveCurrentOrder() {
+        const order = {
+            categories: [],
+            items: {}
+        };
+        
+        const cards = document.querySelectorAll('.category-card');
+        cards.forEach(card => {
+            const categoryName = card.querySelector('.category-title').innerText;
+            order.categories.push(categoryName);
+            
+            order.items[categoryName] = [];
+            const listContainer = card.querySelector('.checklist-list');
+            const children = listContainer.children;
+            for (let child of children) {
+                if (child.classList.contains('checklist-subheader')) {
+                    order.items[categoryName].push({ type: 'subheader', text: child.getAttribute('data-text') });
+                } else if (child.classList.contains('checklist-item')) {
+                    order.items[categoryName].push({ type: 'item', text: child.getAttribute('data-text') });
+                }
+            }
+        });
+        
+        localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+    }
+
+    // Load custom layout order or fallback to default
+    function getSavedOrder() {
+        const saved = localStorage.getItem('fujirock_checklist_order');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        
+        // Generate default order structure if not already saved
+        const order = {
+            categories: Object.keys(packingList),
+            items: {}
+        };
+        for (const [category, categoryData] of Object.entries(packingList)) {
+            order.items[category] = [];
+            for (const [subheader, items] of Object.entries(categoryData)) {
+                if (subheader) {
+                    order.items[category].push({ type: 'subheader', text: subheader });
+                }
+                items.forEach(item => {
+                    order.items[category].push({ type: 'item', text: item });
+                });
+            }
+        }
+        localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+        return order;
     }
 
     // Toggle collapse/expand status of a category card
@@ -446,8 +572,10 @@
     function renderChecklist() {
         const container = document.getElementById('checklistCategories');
         container.innerHTML = '';
+        
+        const currentOrder = getSavedOrder();
 
-        for (const [category, categoryData] of Object.entries(packingList)) {
+        for (const category of currentOrder.categories) {
             const card = document.createElement('div');
             card.className = 'category-card';
             card.id = `card-${category}`;
@@ -455,15 +583,46 @@
                 card.classList.add('collapsed');
             }
 
+            // Drag events for Category Card
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragover', handleDragOver);
+            card.addEventListener('dragend', handleDragEnd);
+
             // Category Header (clickable for collapse/expand toggle)
             const header = document.createElement('div');
             header.className = 'category-header';
-            header.addEventListener('click', () => toggleCategory(category));
+            header.addEventListener('click', (e) => {
+                if (e.target.closest('.drag-handle')) return; // ignore click on drag handle
+                toggleCategory(category);
+            });
+
+            const titleContainer = document.createElement('div');
+            titleContainer.style.display = 'flex';
+            titleContainer.style.alignItems = 'center';
+
+            // Drag handle for Category Card (SVG dots)
+            const dragHandle = document.createElement('div');
+            dragHandle.className = 'drag-handle category-drag-handle';
+            dragHandle.innerHTML = `
+                <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
+                    <circle cx="2.5" cy="3" r="1.5" stroke="none" />
+                    <circle cx="2.5" cy="9" r="1.5" stroke="none" />
+                    <circle cx="2.5" cy="15" r="1.5" stroke="none" />
+                    <circle cx="9.5" cy="3" r="1.5" stroke="none" />
+                    <circle cx="9.5" cy="9" r="1.5" stroke="none" />
+                    <circle cx="9.5" cy="15" r="1.5" stroke="none" />
+                </svg>
+            `;
+            dragHandle.addEventListener('mousedown', () => card.setAttribute('draggable', 'true'));
+            dragHandle.addEventListener('mouseup', () => card.setAttribute('draggable', 'false'));
+
+            titleContainer.appendChild(dragHandle);
 
             const title = document.createElement('span');
             title.className = 'category-title';
             title.innerText = category;
-            header.appendChild(title);
+            titleContainer.appendChild(title);
+            header.appendChild(titleContainer);
 
             // Badge and arrow container
             const badgeContainer = document.createElement('div');
@@ -492,43 +651,103 @@
             const list = document.createElement('div');
             list.className = 'checklist-list';
 
-            for (const [subheader, items] of Object.entries(categoryData)) {
-                if (subheader) {
+            const categoryItems = currentOrder.items[category] || [];
+            
+            // Track if current item should be nested under a subheading
+            let activeSubheader = false;
+
+            categoryItems.forEach(node => {
+                if (node.type === 'subheader') {
+                    activeSubheader = node.text;
                     const subHeaderDiv = document.createElement('div');
+                    subHeaderDiv.className = 'checklist-subheader';
+                    subHeaderDiv.setAttribute('data-text', node.text);
+                    subHeaderDiv.style.display = 'flex';
+                    subHeaderDiv.style.alignItems = 'center';
                     subHeaderDiv.style.fontWeight = 'bold';
                     subHeaderDiv.style.color = 'var(--accent)';
                     subHeaderDiv.style.marginTop = '12px';
                     subHeaderDiv.style.marginBottom = '6px';
                     subHeaderDiv.style.fontSize = '1.05rem';
-                    subHeaderDiv.innerText = `— ${subheader}`;
-                    list.appendChild(subHeaderDiv);
-                }
 
-                items.forEach(item => {
+                    // Subheader drag handle
+                    const subHandle = document.createElement('div');
+                    subHandle.className = 'drag-handle item-drag-handle';
+                    subHandle.innerHTML = `
+                        <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
+                            <circle cx="2.5" cy="3" r="1.5" stroke="none" />
+                            <circle cx="2.5" cy="9" r="1.5" stroke="none" />
+                            <circle cx="2.5" cy="15" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="3" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="9" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="15" r="1.5" stroke="none" />
+                        </svg>
+                    `;
+                    subHandle.addEventListener('mousedown', () => subHeaderDiv.setAttribute('draggable', 'true'));
+                    subHandle.addEventListener('mouseup', () => subHeaderDiv.setAttribute('draggable', 'false'));
+
+                    subHeaderDiv.appendChild(subHandle);
+
+                    const subTextSpan = document.createElement('span');
+                    subTextSpan.innerText = `— ${node.text}`;
+                    subHeaderDiv.appendChild(subTextSpan);
+
+                    // Subheader Drag Events
+                    subHeaderDiv.addEventListener('dragstart', handleDragStart);
+                    subHeaderDiv.addEventListener('dragover', handleDragOver);
+                    subHeaderDiv.addEventListener('dragend', handleDragEnd);
+
+                    list.appendChild(subHeaderDiv);
+                } else if (node.type === 'item') {
                     const label = document.createElement('label');
                     label.className = 'checklist-item';
-                    if (subheader) {
-                        label.style.paddingLeft = '15px';
+                    label.setAttribute('data-text', node.text);
+                    if (activeSubheader) {
+                        label.style.paddingLeft = '15px'; // Indent grouped items
                     }
+
+                    // Item drag handle
+                    const itemHandle = document.createElement('div');
+                    itemHandle.className = 'drag-handle item-drag-handle';
+                    itemHandle.innerHTML = `
+                        <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
+                            <circle cx="2.5" cy="3" r="1.5" stroke="none" />
+                            <circle cx="2.5" cy="9" r="1.5" stroke="none" />
+                            <circle cx="2.5" cy="15" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="3" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="9" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="15" r="1.5" stroke="none" />
+                        </svg>
+                    `;
+                    itemHandle.addEventListener('mousedown', () => label.setAttribute('draggable', 'true'));
+                    itemHandle.addEventListener('mouseup', () => label.setAttribute('draggable', 'false'));
+
+                    label.appendChild(itemHandle);
 
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.checked = checkedItems.has(item);
-                    checkbox.addEventListener('change', () => toggleItem(item, checkbox.checked));
+                    checkbox.checked = checkedItems.has(node.text);
+                    checkbox.addEventListener('change', () => toggleItem(node.text, checkbox.checked));
 
                     const checkmark = document.createElement('span');
                     checkmark.className = 'checkmark';
 
                     const text = document.createElement('span');
                     text.className = 'item-text';
-                    text.innerText = item;
+                    text.innerText = node.text;
 
                     label.appendChild(checkbox);
                     label.appendChild(checkmark);
                     label.appendChild(text);
+
+                    // Item Drag Events
+                    label.addEventListener('dragstart', handleDragStart);
+                    label.addEventListener('dragover', handleDragOver);
+                    label.addEventListener('dragend', handleDragEnd);
+
                     list.appendChild(label);
-                });
-            }
+                }
+            });
 
             content.appendChild(list);
             card.appendChild(content);
@@ -570,7 +789,6 @@
             grandTotal += catTotal;
             grandChecked += catChecked;
             
-            // Update category badge in UI
             const badge = document.getElementById(`badge-${category}`);
             if (badge) {
                 badge.innerText = `${catChecked}/${catTotal}`;
@@ -659,11 +877,12 @@
         ctx.lineTo(canvas.width - 60, 220);
         ctx.stroke();
 
-        // Draw categories & items
+        // Draw categories & items using the current custom drag-and-drop order
         let currY = 260;
         const xLeft = 80;
+        const currentOrder = getSavedOrder();
 
-        for (const [category, categoryData] of Object.entries(packingList)) {
+        for (const category of currentOrder.categories) {
             // Category header
             ctx.fillStyle = '#FF8A00';
             ctx.font = 'bold 26px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
@@ -671,18 +890,20 @@
             ctx.fillText(category, xLeft, currY);
             currY += 45;
 
-            for (const [subheader, items] of Object.entries(categoryData)) {
-                if (subheader) {
+            const categoryItems = currentOrder.items[category] || [];
+            let activeSubheader = false;
+
+            categoryItems.forEach(node => {
+                if (node.type === 'subheader') {
+                    activeSubheader = node.text;
                     ctx.fillStyle = '#FF4B4B';
                     ctx.font = 'bold 20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-                    ctx.fillText(`— ${subheader}`, xLeft + 10, currY);
+                    ctx.fillText(`— ${node.text}`, xLeft + 10, currY);
                     currY += 35;
-                }
-
-                items.forEach(item => {
-                    const isChecked = checkedItems.has(item);
+                } else if (node.type === 'item') {
+                    const isChecked = checkedItems.has(node.text);
                     const boxSize = 20;
-                    const boxX = subheader ? xLeft + 20 : xLeft + 10;
+                    const boxX = activeSubheader ? xLeft + 20 : xLeft + 10;
                     const boxY = currY - 18; // Align box with text line
 
                     if (isChecked) {
@@ -711,10 +932,10 @@
                     // Draw label text
                     ctx.fillStyle = isChecked ? '#A0A0B0' : '#FFFFFF';
                     ctx.font = '22px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-                    ctx.fillText(item, boxX + boxSize + 20, currY);
+                    ctx.fillText(node.text, boxX + boxSize + 20, currY);
                     currY += 35;
-                });
-            }
+                }
+            });
 
             currY += 20; // Category spacer gap
         }
