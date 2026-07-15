@@ -492,42 +492,46 @@
         e.dataTransfer.effectAllowed = 'move';
     }
 
+    function handleDragOver(e) {
+        e.preventDefault();
+        const draggingEl = document.querySelector('.dragging');
+        if (!draggingEl) return;
+        
+        // Element swap check
+        if (draggingEl.classList.contains('category-card') && this.classList.contains('category-card')) {
+            if (draggingEl !== this) {
+                const parent = this.parentNode;
+                const children = Array.from(parent.children);
+                const sourceIndex = children.indexOf(draggingEl);
+                const targetIndex = children.indexOf(this);
+                if (sourceIndex < targetIndex) {
+                    parent.insertBefore(draggingEl, this.nextSibling);
+                } else {
+                    parent.insertBefore(draggingEl, this);
+                }
+            }
+        } else if ((draggingEl.classList.contains('checklist-item') || draggingEl.classList.contains('checklist-subheader')) && 
+                   (this.classList.contains('checklist-item') || this.classList.contains('checklist-subheader'))) {
+            if (draggingEl !== this) {
+                const parent = this.parentNode;
+                const children = Array.from(parent.children);
+                const sourceIndex = children.indexOf(draggingEl);
+                const targetIndex = children.indexOf(this);
+                if (sourceIndex < targetIndex) {
+                    parent.insertBefore(draggingEl, this.nextSibling);
+                } else {
+                    parent.insertBefore(draggingEl, this);
+                }
+            }
+        }
+    }
+
     function handleDragEnd(e) {
         this.classList.remove('dragging');
         saveCurrentOrder();
         
         // Re-render checklist to recalculate visual indentations after drag-and-drop
         renderChecklist();
-    }
-
-    // Helper to calculate card drop placement
-    function getDragAfterCategory(container, y) {
-        const draggableCards = [...container.querySelectorAll('.category-card:not(.dragging)')];
-        
-        return draggableCards.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
-    // Helper to calculate list item drop placement
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.checklist-item:not(.dragging), .checklist-subheader:not(.dragging)')];
-        
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
     // Save custom category and items layout order to localStorage
@@ -602,17 +606,15 @@
         const container = document.getElementById('checklistCategories');
         container.innerHTML = '';
         
-        // Register dragover listener on container to reorder category cards smoothly
+        // Register dragover listener on container to allow dropping onto empty spots
         container.addEventListener('dragover', (e) => {
             e.preventDefault();
             const draggingEl = document.querySelector('.dragging');
             if (!draggingEl || !draggingEl.classList.contains('category-card')) return;
             
-            const afterCard = getDragAfterCategory(container, e.clientY);
-            if (afterCard == null) {
+            // Fallback for empty container card sorting
+            if (container.children.length === 0) {
                 container.appendChild(draggingEl);
-            } else {
-                container.insertBefore(draggingEl, afterCard);
             }
         });
         
@@ -627,7 +629,9 @@
             }
 
             // Drag events for Category Card
+            card.setAttribute('draggable', 'true');
             card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragover', handleDragOver);
             card.addEventListener('dragend', handleDragEnd);
 
             // Category Header (clickable for collapse/expand toggle)
@@ -655,7 +659,6 @@
                     <circle cx="9.5" cy="15" r="1.5" stroke="none" />
                 </svg>
             `;
-            card.setAttribute('draggable', 'true');
             titleContainer.appendChild(dragHandle);
 
             const title = document.createElement('span');
@@ -692,18 +695,15 @@
             list.className = 'checklist-list';
             list.id = `list-${category}`;
 
-            // Allow dropping onto empty list containers or empty spaces within lists
+            // Allow dropping onto empty list containers
             list.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 const draggingEl = document.querySelector('.dragging');
                 if (!draggingEl) return;
                 if (!draggingEl.classList.contains('checklist-item') && !draggingEl.classList.contains('checklist-subheader')) return;
                 
-                const afterElement = getDragAfterElement(list, e.clientY);
-                if (afterElement == null) {
+                if (list.children.length === 0) {
                     list.appendChild(draggingEl);
-                } else {
-                    list.insertBefore(draggingEl, afterElement);
                 }
             });
 
@@ -748,6 +748,7 @@
 
                     // Subheader Drag Events
                     subHeaderDiv.addEventListener('dragstart', handleDragStart);
+                    subHeaderDiv.addEventListener('dragover', handleDragOver);
                     subHeaderDiv.addEventListener('dragend', handleDragEnd);
 
                     list.appendChild(subHeaderDiv);
@@ -793,6 +794,7 @@
 
                     // Item Drag Events
                     label.addEventListener('dragstart', handleDragStart);
+                    label.addEventListener('dragover', handleDragOver);
                     label.addEventListener('dragend', handleDragEnd);
 
                     list.appendChild(label);
