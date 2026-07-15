@@ -1,0 +1,316 @@
+import streamlit as st
+import streamlit.components.v1 as components
+from PIL import Image, ImageDraw, ImageFont
+import io
+
+def initialize_data():
+    if 'packing_list' not in st.session_state:
+        st.session_state.packing_list = {
+            "회장 휴대용 배낭": {
+                "[배면 포켓]": ["선크림", "페이스 시트", "맥주 너클 오프너", "모기 퇴치 스프레이"],
+                "[사이드 포켓]": ["물병/텀블러"],
+                "[내용물]": ["수건", "판초 우의 (파랑)", "플리스"],
+                "<노란 파우치>": ["보조배터리", "USB 케이블류", "헤드랜턴", "AAA 건전지"],
+                "<빨간 파우치>": ["스포츠 테이핑 테이프", "대일밴드 (반창고)", "손톱깎이", "콘택트렌즈", "소염진통제 (로키소닌)", "파스 (로키소닌 패치)", "휴대용 티슈"]
+            },
+            "숙소 배낭": {
+                "[등 포켓]": ["지갑 (카드류 제외)"],
+                "[내용물]": ["비닐봉지", "페스티벌용 T셔츠 (3장)", "속옷 (1장)", "양말 (1켤레)", "여분 수건", "3일차 손수건", "헤어 스프레이", "스킨/토너", "크림", "면도기"]
+            },
+            "차에 두고 갈 것": {
+                "": ["에어매트", "미니 아이스박스", "접이식 우산"],
+                "[대시보드]": ["주차권", "손목밴드 (입장권)", "타임테이블"],
+                "[차박 박스]": ["바디 시트", "취침용 T셔츠", "속옷 (2장)", "양말 (1켤레)", "복귀용 여분 옷", "비닐봉지 (여분)", "2일차 수건", "3일차 수건", "막 쓰는 수건", "2일차 손수건 (빨아서 쓰기)", "모자 (캡)"],
+                "[기타 박스]": ["장화", "샌들", "차량용 햇빛 가리개"],
+                "[노란 배낭]": ["접이식 의자 (대)"]
+            },
+            "당일 챙길 것": {
+                "<카드 지갑 (UnderTheSun)>": ["건강보험증", "운전면허증", "현금"],
+                "<기타>": ["손수건", "집 열쇠", "차 열쇠", "애플워치", "애플워치 충전기/배터리", "멀티탭", "스킨/토너 (여행용)", "크림 (여행용)", "면도기 (여분)", "무선 이어폰"]
+            },
+            "당일 착용할 것": {
+                "": ["선글라스", "햇 (모자)", "기능성 이너웨어", "기능성 상의", "기능성 하의", "T셔츠", "속건성 바지", "속옷", "손수건", "스마트폰"]
+            }
+        }
+    
+    if 'checked_items' not in st.session_state:
+        st.session_state.checked_items = set()
+    else:
+        # Filter out items that are no longer in the checklist to prevent progress calculation errors
+        all_items = set()
+        for category_data in st.session_state.packing_list.values():
+            for items in category_data.values():
+                all_items.update(items)
+        st.session_state.checked_items = {item for item in st.session_state.checked_items if item in all_items}
+
+def reset_checklist():
+    st.session_state.checked_items.clear()
+    for category, category_data in st.session_state.packing_list.items():
+        for subheader, items in category_data.items():
+            for item in items:
+                if item in st.session_state:
+                    st.session_state[item] = False
+
+def generate_checklist_image():
+    # Setup dimensions dynamically based on actual list sizes and subheaders to prevent clipping
+    width = 800
+    
+    total_items = sum(len(items) for category_data in st.session_state.packing_list.values() for items in category_data.values())
+    num_categories = len(st.session_state.packing_list)
+    num_subheaders = sum(1 for category_data in st.session_state.packing_list.values() for subheader in category_data.keys() if subheader)
+    
+    # 250 (header space) + (items * 35) + (subheaders * 35) + (categories * 65) + 100 (footer padding)
+    height = 250 + (total_items * 35) + (num_subheaders * 35) + (num_categories * 65) + 100
+    
+    # Create image with premium dark background
+    image = Image.new("RGB", (width, height), "#1A1A24")
+    draw = ImageDraw.Draw(image)
+    
+    # Load fonts
+    font_path = "/System/Library/Fonts/AppleSDGothicNeo.ttc"
+    try:
+        font_title = ImageFont.truetype(font_path, 36)
+        font_subtitle = ImageFont.truetype(font_path, 20)
+        font_category = ImageFont.truetype(font_path, 26)
+        font_item = ImageFont.truetype(font_path, 22)
+    except Exception:
+        font_title = ImageFont.load_default()
+        font_subtitle = ImageFont.load_default()
+        font_category = ImageFont.load_default()
+        font_item = ImageFont.load_default()
+        
+    # Draw header (No emojis to prevent tofu boxes)
+    draw.text((width/2, 60), "FUJI ROCK FESTIVAL", fill="#FF8A00", font=font_title, anchor="ms")
+    draw.text((width/2, 100), "후지록 페스티벌 준비물 체크리스트", fill="#FFFFFF", font=font_subtitle, anchor="ms")
+    
+    # Calculate progress
+    progress_pct = int((checked_count / total_items) * 100) if total_items > 0 else 0
+    
+    # Draw progress bar container
+    pb_x = 80
+    pb_y = 130
+    pb_w = width - 160
+    pb_h = 24
+    draw.rounded_rectangle([pb_x, pb_y, pb_x + pb_w, pb_y + pb_h], radius=12, fill="#2D2D3D")
+    
+    # Draw filled progress bar
+    if checked_count > 0:
+        filled_w = (pb_w * checked_count) // total_items
+        draw.rounded_rectangle([pb_x, pb_y, pb_x + filled_w, pb_y + pb_h], radius=12, fill="#FF4B4B")
+        
+    # Draw progress text
+    progress_text = f"진행률: {progress_pct}% ({checked_count} / {total_items})"
+    draw.text((width/2, 185), progress_text, fill="#A0A0B0", font=font_subtitle, anchor="ms")
+    
+    # Draw divider line
+    draw.line([60, 210, width - 60, 210], fill="#3D3D4D", width=2)
+    
+    # Draw list categories, subheaders and items
+    curr_y = 250
+    x_left = 80
+    
+    for category, category_data in st.session_state.packing_list.items():
+        # Category header
+        draw.text((x_left, curr_y), category, fill="#FF8A00", font=font_category)
+        curr_y += 45
+        
+        for subheader, items in category_data.items():
+            if subheader:
+                # Draw subheader
+                draw.text((x_left + 10, curr_y), f"— {subheader}", fill="#FF4B4B", font=font_subtitle)
+                curr_y += 35
+                
+            for item in items:
+                is_checked = item in st.session_state.checked_items
+                box_size = 20
+                box_x = x_left + 20 if subheader else x_left + 10
+                box_y = curr_y + 4
+                
+                if is_checked:
+                    # Draw filled red checkbox
+                    draw.rounded_rectangle([box_x, box_y, box_x + box_size, box_y + box_size], radius=4, fill="#FF4B4B")
+                    # Draw white checkmark
+                    draw.line([box_x + 5, box_y + 10, box_x + 9, box_y + 14], fill="#FFFFFF", width=2)
+                    draw.line([box_x + 9, box_y + 14, box_x + 15, box_y + 6], fill="#FFFFFF", width=2)
+                else:
+                    # Draw empty checkbox
+                    draw.rounded_rectangle([box_x, box_y, box_x + box_size, box_y + box_size], radius=4, outline="#A0A0B0", width=2)
+                
+                # Draw text
+                text_x = box_x + box_size + 20
+                text_color = "#FFFFFF" if not is_checked else "#A0A0B0"
+                draw.text((text_x, curr_y), item, fill=text_color, font=font_item)
+                curr_y += 35
+                
+        curr_y += 20
+        
+    # Draw footer
+    draw.text((width/2, height - 40), "만든이 @sigong © 2026", fill="#505060", font=font_subtitle, anchor="ms")
+    
+    # Save image to buffer and return bytes
+    buf = io.BytesIO()
+    image.save(buf, format="JPEG", quality=95)
+    return buf.getvalue()
+
+def main():
+    st.set_page_config(page_title="후지록 준비물 체크리스트", layout="centered")
+    
+    # Inject JavaScript to localize the Streamlit menu and settings modal into Korean, and hide Development options
+    components.html("""
+    <script>
+    const parentDoc = window.parent.document;
+    const translations = {
+        "Rerun": "다시 실행",
+        "Settings": "설정",
+        "Print": "인쇄",
+        "Record a screencast": "화면 녹화",
+        "Developer options": "개발자 옵션",
+        "Clear cache": "캐시 지우기",
+        "Development": "개발 설정",
+        "Run on save": "저장 시 자동 실행",
+        "Automatically updates the app when the underlying code is updated.": "코드가 변경되면 앱을 자동으로 업데이트합니다.",
+        "Appearance": "화면 구성",
+        "Wide mode": "와이드 모드",
+        "Turn on to make this app occupy the entire width of the screen.": "화면 전체 너비를 차지하도록 설정합니다.",
+        "Choose app theme, colors and fonts": "앱 테마, 색상 및 글꼴 선택",
+        "Use system setting": "시스템 설정 사용",
+        "Light": "라이트 모드",
+        "Dark": "다크 모드",
+        "Custom": "사용자 지정",
+        "Edit active theme": "현재 테마 편집",
+        "Made with Streamlit": "Streamlit으로 제작됨"
+    };
+
+    function translateText(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.nodeValue.trim();
+            for (const [key, value] of Object.entries(translations)) {
+                if (text.includes(key)) {
+                    node.nodeValue = node.nodeValue.replace(key, value);
+                }
+            }
+        } else {
+            for (const child of node.childNodes) {
+                translateText(child);
+            }
+        }
+    }
+
+    function cleanDevelopmentSection(root) {
+        if (!root || typeof root.querySelectorAll !== 'function') return;
+        const allElements = root.querySelectorAll('*');
+        allElements.forEach(el => {
+            if (el.children.length === 0 || Array.from(el.childNodes).some(c => c.nodeType === Node.TEXT_NODE && c.nodeValue.trim())) {
+                const text = el.textContent.trim();
+                if (text === "Development" || text === "개발 설정" || 
+                    text === "Run on save" || text === "저장 시 자동 실행" || 
+                    text.includes("Automatically updates the app") || text.includes("코드가 변경되면 앱을 자동으로")) {
+                    
+                    let container = el.closest('[data-testid="stCheckbox"]') || el.closest('label');
+                    if (container) {
+                        container.style.setProperty('display', 'none', 'important');
+                    } else {
+                        let block = el.closest('h1, h2, h3, h4, p, [class*="StyledCaptionContainer"], [data-testid="stText"]');
+                        if (block) {
+                            block.style.setProperty('display', 'none', 'important');
+                        } else {
+                            el.style.setProperty('display', 'none', 'important');
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Observe updates in the parent DOM to translate popups/modals and hide development options when they open
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    translateText(node);
+                    cleanDevelopmentSection(node);
+                }
+            }
+        }
+    });
+
+    observer.observe(parentDoc.body, { childList: true, subtree: true });
+    translateText(parentDoc.body);
+    cleanDevelopmentSection(parentDoc.body);
+    </script>
+    """, height=0, width=0)
+
+    st.title("후지록 페스티벌 준비물 리스트")
+    st.write("체크박스를 눌러 준비 상태를 확인하세요.")
+
+    initialize_data()
+
+    # Sync checked_items with widget states first to prevent rendering lag
+    for category, category_data in st.session_state.packing_list.items():
+        for subheader, items in category_data.items():
+            for item in items:
+                if item in st.session_state:
+                    if st.session_state[item]:
+                        st.session_state.checked_items.add(item)
+                    else:
+                        st.session_state.checked_items.discard(item)
+
+    global checked_count, total_items
+    total_items = sum(len(items) for category_data in st.session_state.packing_list.values() for items in category_data.values())
+    checked_count = len(st.session_state.checked_items)
+    
+    st.progress(checked_count / total_items if total_items > 0 else 0)
+    
+    # Progress info, download button, and reset button row (Top)
+    col_status, col_download, col_reset = st.columns([1.5, 1, 1])
+    with col_status:
+        st.write(f"📊 **진행률: {checked_count} / {total_items}**")
+    with col_download:
+        img_data = generate_checklist_image()
+        st.download_button(
+            label="📸 이미지로 저장",
+            data=img_data,
+            file_name="fujirock_checklist.jpg",
+            mime="image/jpeg",
+            key="download_btn_top"
+        )
+    with col_reset:
+        st.button("🔄 초기화", on_click=reset_checklist, key="reset_btn_top")
+
+    for category, category_data in st.session_state.packing_list.items():
+        st.subheader(category)
+        for subheader, items in category_data.items():
+            if subheader:
+                st.markdown(f"**— {subheader}**")
+            for item in items:
+                is_checked = item in st.session_state.checked_items
+                label = f"↳ {item}" if subheader else item
+                changed = st.checkbox(label, value=is_checked, key=item)
+                
+                if changed and not is_checked:
+                    st.session_state.checked_items.add(item)
+                elif not changed and is_checked:
+                    st.session_state.checked_items.remove(item)
+
+    # Progress info, download button, and reset button row (Bottom)
+    st.write("---")
+    col_status_b, col_download_b, col_reset_b = st.columns([1.5, 1, 1])
+    with col_status_b:
+        st.write(f"📊 **진행률: {checked_count} / {total_items}**")
+    with col_download_b:
+        img_data = generate_checklist_image()
+        st.download_button(
+            label="📸 이미지로 저장",
+            data=img_data,
+            file_name="fujirock_checklist.jpg",
+            mime="image/jpeg",
+            key="download_btn_bottom"
+        )
+    with col_reset_b:
+        st.button("🔄 초기화", on_click=reset_checklist, key="reset_btn_bottom")
+
+    # Footer
+    st.markdown("<p style='text-align: center; color: #a0a0b0; margin-top: 50px;'>만든이 @sigong &copy; 2026</p>", unsafe_allow_html=True)
+
+if __name__ == "__main__":
+    main()
