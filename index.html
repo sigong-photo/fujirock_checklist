@@ -155,7 +155,8 @@
             margin-bottom: 25px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             overflow: hidden;
-            transition: var(--transition);
+            transition: border-color 0.3s ease;
+            position: relative;
         }
 
         .category-card:hover {
@@ -238,6 +239,7 @@
             transition: var(--transition);
             flex-shrink: 0;
             user-select: none;
+            touch-action: none;
         }
 
         .drag-handle:hover {
@@ -254,9 +256,13 @@
         }
 
         .dragging {
-            opacity: 0.4;
+            opacity: 0.15 !important;
             background-color: rgba(255, 255, 255, 0.05) !important;
-            border: 1.5px dashed var(--primary) !important;
+        }
+
+        body.is-sorting * {
+            user-select: none !important;
+            -webkit-user-select: none !important;
         }
 
         .checklist-list {
@@ -270,7 +276,6 @@
             display: flex;
             align-items: center;
             position: relative;
-            cursor: pointer;
             padding: 6px 0;
             user-select: none;
             transition: background-color 0.2s ease;
@@ -479,59 +484,122 @@
         collapsedCategories = new Set(JSON.parse(hasCollapsedPref));
     }
 
-    // Drag and Drop Logic
-    let dragSourceEl = null;
-
-    function handleDragStart(e) {
-        if (!e.target.closest('.drag-handle')) {
+    // Custom Pointer Events based Drag and Drop Engine (Supports desktop mouse & mobile touch natively)
+    function makeSortable(container, opts) {
+        container.addEventListener('pointerdown', e => {
+            if (e.button != null && e.button !== 0) return;
+            const handle = e.target.closest(opts.handleSelector);
+            if (!handle || !container.contains(handle)) return;
+            const row = handle.closest(opts.rowSelector);
+            if (!row) return;
             e.preventDefault();
-            return;
-        }
-        dragSourceEl = this;
-        this.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
+            startDrag(container, row, handle, e, opts);
+        });
     }
 
-    function handleDragOver(e) {
-        e.preventDefault();
-        const draggingEl = document.querySelector('.dragging');
-        if (!draggingEl) return;
-        
-        // Element swap check
-        if (draggingEl.classList.contains('category-card') && this.classList.contains('category-card')) {
-            if (draggingEl !== this) {
-                const parent = this.parentNode;
-                const children = Array.from(parent.children);
-                const sourceIndex = children.indexOf(draggingEl);
-                const targetIndex = children.indexOf(this);
-                if (sourceIndex < targetIndex) {
-                    parent.insertBefore(draggingEl, this.nextSibling);
-                } else {
-                    parent.insertBefore(draggingEl, this);
-                }
-            }
-        } else if ((draggingEl.classList.contains('checklist-item') || draggingEl.classList.contains('checklist-subheader')) && 
-                   (this.classList.contains('checklist-item') || this.classList.contains('checklist-subheader'))) {
-            if (draggingEl !== this) {
-                const parent = this.parentNode;
-                const children = Array.from(parent.children);
-                const sourceIndex = children.indexOf(draggingEl);
-                const targetIndex = children.indexOf(this);
-                if (sourceIndex < targetIndex) {
-                    parent.insertBefore(draggingEl, this.nextSibling);
-                } else {
-                    parent.insertBefore(draggingEl, this);
-                }
-            }
-        }
-    }
+    function startDrag(container, row, handle, e, opts) {
+        const rect = row.getBoundingClientRect();
+        const offsetY = e.clientY - rect.top;
+        const offsetX = e.clientX - rect.left;
 
-    function handleDragEnd(e) {
-        this.classList.remove('dragging');
-        saveCurrentOrder();
-        
-        // Re-render checklist to recalculate visual indentations after drag-and-drop
-        renderChecklist();
+        // Create high-fidelity drag clone (ghost)
+        const ghost = row.cloneNode(true);
+        ghost.classList.add('drag-ghost');
+        ghost.style.position = 'fixed';
+        ghost.style.zIndex = '10000';
+        ghost.style.pointerEvents = 'none';
+        ghost.style.width = rect.width + 'px';
+        ghost.style.height = rect.height + 'px';
+        ghost.style.left = rect.left + 'px';
+        ghost.style.top = rect.top + 'px';
+        ghost.style.opacity = '0.85';
+        ghost.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.5)';
+        ghost.style.transform = 'scale(1.02)';
+        ghost.style.transition = 'transform 0.1s ease';
+        document.body.appendChild(ghost);
+
+        row.classList.add('dragging');
+        document.body.classList.add('is-sorting');
+
+        try {
+            handle.setPointerCapture(e.pointerId);
+        } catch (_) {}
+
+        const moveGhost = (clientX, clientY) => {
+            ghost.style.top = (clientY - offsetY) + 'px';
+            ghost.style.left = (clientX - offsetX) + 'px';
+        };
+
+        moveGhost(e.clientX, e.clientY);
+
+        const onMove = ev => {
+            moveGhost(ev.clientX, ev.clientY);
+
+            // Auto-scroll when dragging near viewport top/bottom
+            const scrollMargin = 72;
+            if (ev.clientY < scrollMargin) {
+                window.scrollBy(0, -8);
+            } else if (ev.clientY > window.innerHeight - scrollMargin) {
+                window.scrollBy(0, 8);
+            }
+
+            if (opts.type === 'category') {
+                const siblings = [...container.children].filter(ch => ch.classList.contains('category-card') && ch !== row);
+                let after = null;
+                for (const s of siblings) {
+                    const r = s.getBoundingClientRect();
+                    if (ev.clientY < r.top + r.height / 2) {
+                        after = s;
+                        break;
+                    }
+                }
+                if (after == null) {
+                    container.appendChild(row);
+                } else {
+                    container.insertBefore(row, after);
+                }
+            } else if (opts.type === 'item') {
+                // Find list container closest to pointer coordinates to support cross-category drops
+                let targetList = container;
+                const lists = document.querySelectorAll('.checklist-list');
+                for (const list of lists) {
+                    const rList = list.getBoundingClientRect();
+                    if (ev.clientY >= rList.top - 30 && ev.clientY <= rList.bottom + 30 &&
+                        ev.clientX >= rList.left - 30 && ev.clientX <= rList.right + 30) {
+                        targetList = list;
+                        break;
+                    }
+                }
+
+                const siblings = [...targetList.children].filter(ch => ch !== row);
+                let after = null;
+                for (const s of siblings) {
+                    const r = s.getBoundingClientRect();
+                    if (ev.clientY < r.top + r.height / 2) {
+                        after = s;
+                        break;
+                    }
+                }
+                if (after == null) {
+                    targetList.appendChild(row);
+                } else {
+                    targetList.insertBefore(row, after);
+                }
+            }
+        };
+
+        const onUp = () => {
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onUp);
+            ghost.remove();
+            row.classList.remove('dragging');
+            document.body.classList.remove('is-sorting');
+            saveCurrentOrder();
+            renderChecklist();
+        };
+
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', onUp);
     }
 
     // Save custom category and items layout order to localStorage
@@ -606,18 +674,6 @@
         const container = document.getElementById('checklistCategories');
         container.innerHTML = '';
         
-        // Register dragover listener on container to allow dropping onto empty spots
-        container.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const draggingEl = document.querySelector('.dragging');
-            if (!draggingEl || !draggingEl.classList.contains('category-card')) return;
-            
-            // Fallback for empty container card sorting
-            if (container.children.length === 0) {
-                container.appendChild(draggingEl);
-            }
-        });
-        
         const currentOrder = getSavedOrder();
 
         for (const category of currentOrder.categories) {
@@ -627,12 +683,6 @@
             if (collapsedCategories.has(category)) {
                 card.classList.add('collapsed');
             }
-
-            // Drag events for Category Card
-            card.setAttribute('draggable', 'true');
-            card.addEventListener('dragstart', handleDragStart);
-            card.addEventListener('dragover', handleDragOver);
-            card.addEventListener('dragend', handleDragEnd);
 
             // Category Header (clickable for collapse/expand toggle)
             const header = document.createElement('div');
@@ -695,18 +745,6 @@
             list.className = 'checklist-list';
             list.id = `list-${category}`;
 
-            // Allow dropping onto empty list containers
-            list.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                const draggingEl = document.querySelector('.dragging');
-                if (!draggingEl) return;
-                if (!draggingEl.classList.contains('checklist-item') && !draggingEl.classList.contains('checklist-subheader')) return;
-                
-                if (list.children.length === 0) {
-                    list.appendChild(draggingEl);
-                }
-            });
-
             const categoryItems = currentOrder.items[category] || [];
             
             // Track if current item should be nested under a subheading
@@ -739,17 +777,11 @@
                             <circle cx="9.5" cy="15" r="1.5" stroke="none" />
                         </svg>
                     `;
-                    subHeaderDiv.setAttribute('draggable', 'true');
                     subHeaderDiv.appendChild(subHandle);
 
                     const subTextSpan = document.createElement('span');
                     subTextSpan.innerText = `— ${node.text}`;
                     subHeaderDiv.appendChild(subTextSpan);
-
-                    // Subheader Drag Events
-                    subHeaderDiv.addEventListener('dragstart', handleDragStart);
-                    subHeaderDiv.addEventListener('dragover', handleDragOver);
-                    subHeaderDiv.addEventListener('dragend', handleDragEnd);
 
                     list.appendChild(subHeaderDiv);
                 } else if (node.type === 'item') {
@@ -773,7 +805,6 @@
                             <circle cx="9.5" cy="15" r="1.5" stroke="none" />
                         </svg>
                     `;
-                    label.setAttribute('draggable', 'true');
                     label.appendChild(itemHandle);
 
                     const checkbox = document.createElement('input');
@@ -802,11 +833,6 @@
                     label.appendChild(checkmark);
                     label.appendChild(text);
 
-                    // Item Drag Events
-                    label.addEventListener('dragstart', handleDragStart);
-                    label.addEventListener('dragover', handleDragOver);
-                    label.addEventListener('dragend', handleDragEnd);
-
                     list.appendChild(label);
                 }
             });
@@ -815,6 +841,22 @@
             card.appendChild(content);
             container.appendChild(card);
         }
+
+        // Initialize custom Pointer Events based sorting on list containers
+        makeSortable(container, {
+            rowSelector: '.category-card',
+            handleSelector: '.category-drag-handle',
+            type: 'category'
+        });
+
+        const lists = document.querySelectorAll('.checklist-list');
+        lists.forEach(list => {
+            makeSortable(list, {
+                rowSelector: '.checklist-item, .checklist-subheader',
+                handleSelector: '.item-drag-handle',
+                type: 'item'
+            });
+        });
 
         updateProgress();
     }
