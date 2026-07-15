@@ -71,7 +71,7 @@
             margin-bottom: 30px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .progress-container {
@@ -210,7 +210,7 @@
             padding: 24px;
             border-top: 1px solid var(--border-color);
             transition: max-height 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease;
-            max-height: 1500px;
+            max-height: 2500px;
             opacity: 1;
         }
 
@@ -263,6 +263,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            min-height: 50px; /* Helper to allow dropping onto empty list containers */
         }
 
         .checklist-item {
@@ -381,6 +382,22 @@
             </div>
             <div class="progress-text" id="progressText">진행률: 0/74</div>
         </div>
+        
+        <!-- Instruction Text with drag handle prefix -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-sub); font-size: 0.95rem; margin-top: -5px; margin-bottom: 5px;">
+            <div class="drag-handle" style="cursor: default; opacity: 0.4;">
+                <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
+                    <circle cx="2.5" cy="3" r="1.5" stroke="none" />
+                    <circle cx="2.5" cy="9" r="1.5" stroke="none" />
+                    <circle cx="2.5" cy="15" r="1.5" stroke="none" />
+                    <circle cx="9.5" cy="3" r="1.5" stroke="none" />
+                    <circle cx="9.5" cy="9" r="1.5" stroke="none" />
+                    <circle cx="9.5" cy="15" r="1.5" stroke="none" />
+                </svg>
+            </div>
+            <span>손잡이로 드래그하여 정렬, 탭으로 확인</span>
+        </div>
+
         <div class="btn-group">
             <button class="btn-reset" onclick="resetAll()">
                 🔄 초기화
@@ -481,16 +498,15 @@
             }
         } else if ((draggingEl.classList.contains('checklist-item') || draggingEl.classList.contains('checklist-subheader')) && 
                    (this.classList.contains('checklist-item') || this.classList.contains('checklist-subheader'))) {
-            if (draggingEl.parentNode === this.parentNode) {
-                const parent = this.parentNode;
-                const children = Array.from(parent.children);
-                const sourceIndex = children.indexOf(draggingEl);
-                const targetIndex = children.indexOf(this);
-                if (sourceIndex < targetIndex) {
-                    parent.insertBefore(draggingEl, this.nextSibling);
-                } else {
-                    parent.insertBefore(draggingEl, this);
-                }
+            // Drag across categories is allowed (we no longer check same parent)
+            const parent = this.parentNode;
+            const children = Array.from(parent.children);
+            const sourceIndex = children.indexOf(draggingEl);
+            const targetIndex = children.indexOf(this);
+            if (sourceIndex < targetIndex) {
+                parent.insertBefore(draggingEl, this.nextSibling);
+            } else {
+                parent.insertBefore(draggingEl, this);
             }
         }
     }
@@ -499,6 +515,9 @@
         this.classList.remove('dragging');
         this.setAttribute('draggable', 'false');
         saveCurrentOrder();
+        
+        // Re-render checklist to recalculate visual indentations after drag-and-drop
+        renderChecklist();
     }
 
     // Save custom category and items layout order to localStorage
@@ -650,6 +669,19 @@
 
             const list = document.createElement('div');
             list.className = 'checklist-list';
+            list.id = `list-${category}`;
+
+            // Allow dropping onto empty list containers or empty spaces within lists
+            list.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const draggingEl = document.querySelector('.dragging');
+                if (!draggingEl) return;
+                
+                if ((draggingEl.classList.contains('checklist-item') || draggingEl.classList.contains('checklist-subheader')) && 
+                    list.children.length === 0) {
+                    list.appendChild(draggingEl);
+                }
+            });
 
             const categoryItems = currentOrder.items[category] || [];
             
@@ -768,23 +800,26 @@
         updateProgress();
     }
 
-    // Calculate total count and update progress UI
+    // Calculate total count and update progress UI based on current order data
     function updateProgress() {
         let grandTotal = 0;
         let grandChecked = 0;
         
-        for (const [category, categoryData] of Object.entries(packingList)) {
+        const currentOrder = getSavedOrder();
+        
+        for (const category of currentOrder.categories) {
             let catTotal = 0;
             let catChecked = 0;
             
-            for (const items of Object.values(categoryData)) {
-                catTotal += items.length;
-                items.forEach(item => {
-                    if (checkedItems.has(item)) {
+            const categoryItems = currentOrder.items[category] || [];
+            categoryItems.forEach(node => {
+                if (node.type === 'item') {
+                    catTotal++;
+                    if (checkedItems.has(node.text)) {
                         catChecked++;
                     }
-                });
-            }
+                }
+            });
             
             grandTotal += catTotal;
             grandChecked += catChecked;

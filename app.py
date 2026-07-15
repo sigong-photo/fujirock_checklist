@@ -261,6 +261,13 @@ def main():
     
     st.progress(checked_count / total_items if total_items > 0 else 0)
     
+    st.markdown(
+        "<div style='text-align: center; color: #a0a0b0; font-size: 0.95rem; margin-top: -10px; margin-bottom: 15px;'>"
+        "⠿ 손잡이로 드래그하여 정렬, 탭으로 확인"
+        "</div>", 
+        unsafe_allow_html=True
+    )
+    
     # Progress info, download button, and reset button row (Top)
     col_status, col_download, col_reset = st.columns([1.5, 1, 1])
     with col_status:
