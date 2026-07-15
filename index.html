@@ -753,7 +753,7 @@
 
                     list.appendChild(subHeaderDiv);
                 } else if (node.type === 'item') {
-                    const label = document.createElement('label');
+                    const label = document.createElement('div');
                     label.className = 'checklist-item';
                     label.setAttribute('data-text', node.text);
                     if (activeSubheader) {
@@ -783,10 +783,20 @@
 
                     const checkmark = document.createElement('span');
                     checkmark.className = 'checkmark';
+                    checkmark.style.cursor = 'pointer';
+                    checkmark.addEventListener('click', () => {
+                        checkbox.checked = !checkbox.checked;
+                        toggleItem(node.text, checkbox.checked);
+                    });
 
                     const text = document.createElement('span');
                     text.className = 'item-text';
                     text.innerText = node.text;
+                    text.style.cursor = 'pointer';
+                    text.addEventListener('click', () => {
+                        checkbox.checked = !checkbox.checked;
+                        toggleItem(node.text, checkbox.checked);
+                    });
 
                     label.appendChild(checkbox);
                     label.appendChild(checkmark);
