@@ -152,24 +152,79 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 24px;
             margin-bottom: 25px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
             transition: var(--transition);
         }
 
         .category-card:hover {
             border-color: #3E3E52;
-            transform: translateY(-2px);
+        }
+
+        .category-header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            background-color: rgba(255, 255, 255, 0.02);
+            transition: var(--transition);
+        }
+
+        .category-header:hover {
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .category-title {
             font-size: 1.3rem;
             font-weight: 700;
             color: var(--primary);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 18px;
+        }
+
+        .category-badge {
+            background-color: var(--accent);
+            color: var(--text-main);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(255, 75, 75, 0.3);
+            transition: var(--transition);
+        }
+
+        .category-badge.complete {
+            background-color: #2ED573;
+            box-shadow: 0 2px 8px rgba(46, 213, 115, 0.3);
+        }
+
+        .toggle-arrow {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+        }
+
+        .category-content {
+            padding: 24px;
+            border-top: 1px solid var(--border-color);
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease;
+            max-height: 1200px;
+            opacity: 1;
+        }
+
+        .category-card.collapsed .category-content {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+            border-top-color: transparent;
+            pointer-events: none;
+        }
+
+        .category-card.collapsed .toggle-arrow {
+            transform: rotate(-180deg);
         }
 
         .checklist-list {
@@ -364,6 +419,22 @@
     const savedItems = JSON.parse(localStorage.getItem('fujirock_checked_items') || '[]');
     let checkedItems = new Set(savedItems.filter(item => allPackingItems.has(item)));
 
+    // Load collapsed preference from localStorage
+    let collapsedCategories = new Set(JSON.parse(localStorage.getItem('fujirock_collapsed_categories') || '[]'));
+
+    // Toggle collapse/expand status of a category card
+    function toggleCategory(category) {
+        const card = document.getElementById(`card-${category}`);
+        if (card.classList.contains('collapsed')) {
+            card.classList.remove('collapsed');
+            collapsedCategories.delete(category);
+        } else {
+            card.classList.add('collapsed');
+            collapsedCategories.add(category);
+        }
+        localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+    }
+
     // Initialize list and render in DOM
     function renderChecklist() {
         const container = document.getElementById('checklistCategories');
@@ -372,11 +443,44 @@
         for (const [category, categoryData] of Object.entries(packingList)) {
             const card = document.createElement('div');
             card.className = 'category-card';
+            card.id = `card-${category}`;
+            if (collapsedCategories.has(category)) {
+                card.classList.add('collapsed');
+            }
 
-            const title = document.createElement('div');
+            // Category Header (clickable for collapse/expand toggle)
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            header.addEventListener('click', () => toggleCategory(category));
+
+            const title = document.createElement('span');
             title.className = 'category-title';
             title.innerText = category;
-            card.appendChild(title);
+            header.appendChild(title);
+
+            // Badge and arrow container
+            const badgeContainer = document.createElement('div');
+            badgeContainer.style.display = 'flex';
+            badgeContainer.style.alignItems = 'center';
+            badgeContainer.style.gap = '10px';
+
+            const badge = document.createElement('span');
+            badge.className = 'category-badge';
+            badge.id = `badge-${category}`;
+            badgeContainer.appendChild(badge);
+
+            const arrow = document.createElement('span');
+            arrow.className = 'toggle-arrow';
+            arrow.innerText = '▲';
+            badgeContainer.appendChild(arrow);
+
+            header.appendChild(badgeContainer);
+            card.appendChild(header);
+
+            // Category Content
+            const content = document.createElement('div');
+            content.className = 'category-content';
+            content.id = `content-${category}`;
 
             const list = document.createElement('div');
             list.className = 'checklist-list';
@@ -397,7 +501,7 @@
                     const label = document.createElement('label');
                     label.className = 'checklist-item';
                     if (subheader) {
-                        label.style.paddingLeft = '15px'; // Indent grouped items
+                        label.style.paddingLeft = '15px';
                     }
 
                     const checkbox = document.createElement('input');
@@ -419,7 +523,8 @@
                 });
             }
 
-            card.appendChild(list);
+            content.appendChild(list);
+            card.appendChild(content);
             container.appendChild(card);
         }
 
@@ -439,17 +544,40 @@
 
     // Calculate total count and update progress UI
     function updateProgress() {
-        let totalItems = 0;
-        for (const catData of Object.values(packingList)) {
+        let grandTotal = 0;
+        let grandChecked = 0;
+        
+        for (const [category, categoryData] of Object.entries(packingList)) {
+            let catTotal = 0;
+            let catChecked = 0;
+            
             for (const items of Object.values(catData)) {
-                totalItems += items.length;
+                catTotal += items.length;
+                items.forEach(item => {
+                    if (checkedItems.has(item)) {
+                        catChecked++;
+                    }
+                });
+            }
+            
+            grandTotal += catTotal;
+            grandChecked += catChecked;
+            
+            // Update category badge in UI
+            const badge = document.getElementById(`badge-${category}`);
+            if (badge) {
+                badge.innerText = `${catChecked}/${catTotal}`;
+                if (catChecked === catTotal && catTotal > 0) {
+                    badge.classList.add('complete');
+                } else {
+                    badge.classList.remove('complete');
+                }
             }
         }
-        const checkedCount = checkedItems.size;
-        const fillPercent = totalItems > 0 ? (checkedCount / totalItems) * 100 : 0;
 
+        const fillPercent = grandTotal > 0 ? (grandChecked / grandTotal) * 100 : 0;
         document.getElementById('progressFill').style.width = `${fillPercent}%`;
-        document.getElementById('progressText').innerText = `진행률: ${checkedCount}/${totalItems}`;
+        document.getElementById('progressText').innerText = `진행률: ${grandChecked}/${grandTotal}`;
     }
 
     // Clear state

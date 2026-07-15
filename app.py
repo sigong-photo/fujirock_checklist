@@ -278,19 +278,26 @@ def main():
         st.button("🔄 초기화", on_click=reset_checklist, key="reset_btn_top")
 
     for category, category_data in st.session_state.packing_list.items():
-        st.subheader(category)
-        for subheader, items in category_data.items():
-            if subheader:
-                st.markdown(f"**— {subheader}**")
-            for item in items:
-                is_checked = item in st.session_state.checked_items
-                label = f"↳ {item}" if subheader else item
-                changed = st.checkbox(label, value=is_checked, key=item)
-                
-                if changed and not is_checked:
-                    st.session_state.checked_items.add(item)
-                elif not changed and is_checked:
-                    st.session_state.checked_items.remove(item)
+        # Calculate category statistics
+        cat_total = sum(len(items) for items in category_data.values())
+        cat_checked = sum(1 for items in category_data.values() for item in items if item in st.session_state.checked_items)
+        
+        # Expander with live progress label
+        expander_title = f"{category} ({cat_checked} / {cat_total})"
+        
+        with st.expander(expander_title, expanded=True):
+            for subheader, items in category_data.items():
+                if subheader:
+                    st.markdown(f"**— {subheader}**")
+                for item in items:
+                    is_checked = item in st.session_state.checked_items
+                    label = f"↳ {item}" if subheader else item
+                    changed = st.checkbox(label, value=is_checked, key=item)
+                    
+                    if changed and not is_checked:
+                        st.session_state.checked_items.add(item)
+                    elif not changed and is_checked:
+                        st.session_state.checked_items.remove(item)
 
     # Progress info, download button, and reset button row (Bottom)
     st.write("---")
