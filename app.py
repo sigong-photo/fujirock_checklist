@@ -285,7 +285,7 @@ def main():
         # Expander with live progress label
         expander_title = f"{category} ({cat_checked} / {cat_total})"
         
-        with st.expander(expander_title, expanded=True):
+        with st.expander(expander_title, expanded=False):
             for subheader, items in category_data.items():
                 if subheader:
                     st.markdown(f"**— {subheader}**")

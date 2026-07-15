@@ -419,8 +419,15 @@
     const savedItems = JSON.parse(localStorage.getItem('fujirock_checked_items') || '[]');
     let checkedItems = new Set(savedItems.filter(item => allPackingItems.has(item)));
 
-    // Load collapsed preference from localStorage
-    let collapsedCategories = new Set(JSON.parse(localStorage.getItem('fujirock_collapsed_categories') || '[]'));
+    // Load collapsed preference from localStorage, default all collapsed on first run
+    const hasCollapsedPref = localStorage.getItem('fujirock_collapsed_categories');
+    let collapsedCategories;
+    if (hasCollapsedPref === null) {
+        collapsedCategories = new Set(Object.keys(packingList));
+        localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+    } else {
+        collapsedCategories = new Set(JSON.parse(hasCollapsedPref));
+    }
 
     // Toggle collapse/expand status of a category card
     function toggleCategory(category) {
