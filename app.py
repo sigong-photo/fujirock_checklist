@@ -6,7 +6,7 @@ import io
 def initialize_data():
     if 'packing_list' not in st.session_state:
         st.session_state.packing_list = {
-            "회장 휴대용 배낭": {
+            "공연장 휴대용 배낭": {
                 "[배면 포켓]": ["선크림", "페이스 시트", "맥주 너클 오프너", "모기 퇴치 스프레이"],
                 "[사이드 포켓]": ["물병/텀블러"],
                 "[내용물]": ["수건", "판초 우의 (파랑)", "플리스"],

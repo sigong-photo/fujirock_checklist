@@ -524,7 +524,7 @@
 <script>
     // Updated checklist matching the provided web URL (Translated to Korean, grouped with subheaders)
     const packingList = {
-        "회장 휴대용 배낭": {
+        "공연장 휴대용 배낭": {
             "[배면 포켓]": ["선크림", "페이스 시트", "맥주 너클 오프너", "모기 퇴치 스프레이"],
             "[사이드 포켓]": ["물병/텀블러"],
             "[내용물]": ["수건", "판초 우의 (파랑)", "플리스"],
@@ -567,7 +567,30 @@
                     }
                     return node;
                 });
-                localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            }
+            // LocalStorage Migration: Update category "회장 휴대용 배낭" to "공연장 휴대용 배낭"
+            if (order.categories) {
+                const idx = order.categories.indexOf("회장 휴대용 배낭");
+                if (idx !== -1) {
+                    order.categories[idx] = "공연장 휴대용 배낭";
+                }
+                if (order.items && order.items["회장 휴대용 배낭"]) {
+                    order.items["공연장 휴대용 배낭"] = order.items["회장 휴대용 배낭"];
+                    delete order.items["회장 휴대용 배낭"];
+                }
+            }
+            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+
+            const collapsedRaw = localStorage.getItem('fujirock_collapsed_categories');
+            if (collapsedRaw) {
+                try {
+                    let collapsed = JSON.parse(collapsedRaw);
+                    const cIdx = collapsed.indexOf("회장 휴대용 배낭");
+                    if (cIdx !== -1) {
+                        collapsed[cIdx] = "공연장 휴대용 배낭";
+                        localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(collapsed));
+                    }
+                } catch (e) {}
             }
             return order;
         }
