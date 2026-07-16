@@ -543,7 +543,7 @@
             "[노란 배낭]": ["접이식 의자 (대)"]
         },
         "당일 챙길 것": {
-            "<카드 지갑 (UnderTheSun)>": ["건강보험증", "운전면허증", "현금"],
+            "<카드 지갑>": ["건강보험증", "운전면허증", "현금"],
             "<기타>": ["손수건", "집 열쇠", "차 열쇠", "애플워치", "애플워치 충전기/배터리", "멀티탭", "스킨/토너 (여행용)", "크림 (여행용)", "면도기 (여분)", "무선 이어폰"]
         },
         "당일 착용할 것": {
@@ -558,7 +558,18 @@
     function getSavedOrder() {
         const saved = localStorage.getItem('fujirock_checklist_order');
         if (saved) {
-            return JSON.parse(saved);
+            let order = JSON.parse(saved);
+            // LocalStorage Migration: Update old subheader names to keep existing sessions synced
+            if (order.items && order.items["당일 챙길 것"]) {
+                order.items["당일 챙길 것"] = order.items["당일 챙길 것"].map(node => {
+                    if (node.type === 'subheader' && node.text === '<카드 지갑 (UnderTheSun)>') {
+                        node.text = '<카드 지갑>';
+                    }
+                    return node;
+                });
+                localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            }
+            return order;
         }
         
         // Generate default order structure if not already saved
