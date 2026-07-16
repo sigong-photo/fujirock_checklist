@@ -914,9 +914,13 @@
 
     // Clear state
     function resetAll() {
-        if (confirm("모든 체크 상태를 초기화하시겠습니까?")) {
+        if (confirm("모든 체크 상태와 항목 순서를 초기화하시겠습니까?")) {
             checkedItems.clear();
             localStorage.removeItem('fujirock_checked_items');
+            localStorage.removeItem('fujirock_checklist_order');
+            localStorage.removeItem('fujirock_collapsed_categories');
+            collapsedCategories = new Set(Object.keys(packingList));
+            localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
             renderChecklist();
         }
     }
