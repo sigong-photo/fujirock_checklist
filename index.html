@@ -77,7 +77,7 @@
         .progress-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
         .progress-bar-bg {
@@ -108,6 +108,7 @@
             display: flex;
             gap: 15px;
             justify-content: flex-end;
+            flex-wrap: wrap;
         }
 
         button {
@@ -342,6 +343,69 @@
             text-decoration: line-through;
         }
 
+        /* Edit Mode Styles */
+        .edit-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed var(--border-color);
+            color: var(--text-main);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: inherit;
+            font-weight: inherit;
+            width: 100%;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .edit-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+            opacity: 0.6;
+            transition: var(--transition);
+            padding: 4px 8px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-delete:hover {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        .edit-controls-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .btn-add-item {
+            font-size: 0.85rem;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-add-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -382,10 +446,27 @@
     <!-- Status panel (Top) -->
     <div class="stats-panel">
         <div class="progress-container">
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progressFill"></div>
+            <!-- Circular Progress Loader Ring -->
+            <div id="progressRingContainer" style="position: relative; width: 64px; height: 64px; flex-shrink: 0;">
+                <svg width="64" height="64" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="26" stroke="#2D2D3D" stroke-width="6" fill="transparent" />
+                    <circle id="progressRingFill" cx="32" cy="32" r="26" stroke="var(--accent)" stroke-width="6" fill="transparent"
+                            stroke-dasharray="163.36" stroke-dashoffset="163.36" stroke-linecap="round"
+                            style="transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%;" />
+                </svg>
+                <div id="progressRingText" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 700; color: #FFFFFF;">0%</div>
             </div>
-            <div class="progress-text" id="progressText">진행률: 0/74</div>
+
+            <!-- Linear Progress bar -->
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px;">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                    <div style="color: var(--text-sub);" id="checkedCountText">선택된 항목: 0 / 74</div>
+                    <div class="progress-text" id="progressText" style="font-weight: 600;">진행률: 0%</div>
+                </div>
+            </div>
         </div>
         
         <!-- Instruction Text with drag handle prefix -->
@@ -404,6 +485,9 @@
         </div>
 
         <div class="btn-group">
+            <button id="editToggleBtn" class="btn-reset" onclick="toggleEditMode()" style="border-color: var(--primary); color: var(--primary);">
+                ✏️ 편집 모드
+            </button>
             <button class="btn-reset" onclick="resetAll()">
                 🔄 초기화
             </button>
@@ -419,6 +503,9 @@
     <!-- Controls (Bottom) -->
     <div class="stats-panel" style="margin-top: 30px;">
         <div class="btn-group" style="justify-content: center; width: 100%;">
+            <button id="editToggleBtnBottom" class="btn-reset" onclick="toggleEditMode()" style="border-color: var(--primary); color: var(--primary);">
+                ✏️ 편집 모드
+            </button>
             <button class="btn-reset" onclick="resetAll()">
                 🔄 초기화
             </button>
@@ -464,12 +551,45 @@
         }
     };
 
-    // Filter out obsolete items from localStorage to prevent progress bar errors
-    const allPackingItems = new Set();
-    for (const catData of Object.values(packingList)) {
-        for (const items of Object.values(catData)) {
-            items.forEach(item => allPackingItems.add(item));
+    let editMode = false;
+
+    // Load custom layout order or fallback to default
+    function getSavedOrder() {
+        const saved = localStorage.getItem('fujirock_checklist_order');
+        if (saved) {
+            return JSON.parse(saved);
         }
+        
+        // Generate default order structure if not already saved
+        const order = {
+            categories: Object.keys(packingList),
+            items: {}
+        };
+        for (const [category, categoryData] of Object.entries(packingList)) {
+            order.items[category] = [];
+            for (const [subheader, items] of Object.entries(categoryData)) {
+                if (subheader) {
+                    order.items[category].push({ type: 'subheader', text: subheader });
+                }
+                items.forEach(item => {
+                    order.items[category].push({ type: 'item', text: item });
+                });
+            }
+        }
+        localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+        return order;
+    }
+
+    // Filter checked items from localStorage based on saved layout structure
+    const currentOrder = getSavedOrder();
+    const allPackingItems = new Set();
+    for (const category of currentOrder.categories) {
+        const items = currentOrder.items[category] || [];
+        items.forEach(node => {
+            if (node.type === 'item') {
+                allPackingItems.add(node.text);
+            }
+        });
     }
     const savedItems = JSON.parse(localStorage.getItem('fujirock_checked_items') || '[]');
     let checkedItems = new Set(savedItems.filter(item => allPackingItems.has(item)));
@@ -611,7 +731,8 @@
         
         const cards = document.querySelectorAll('.category-card');
         cards.forEach(card => {
-            const categoryName = card.querySelector('.category-title').innerText;
+            const titleEl = card.querySelector('.category-title-input');
+            const categoryName = titleEl ? titleEl.value : card.querySelector('.category-title').innerText;
             order.categories.push(categoryName);
             
             order.items[categoryName] = [];
@@ -619,41 +740,18 @@
             const children = listContainer.children;
             for (let child of children) {
                 if (child.classList.contains('checklist-subheader')) {
-                    order.items[categoryName].push({ type: 'subheader', text: child.getAttribute('data-text') });
+                    const subInput = child.querySelector('.subheader-input');
+                    const subText = subInput ? subInput.value : child.getAttribute('data-text');
+                    order.items[categoryName].push({ type: 'subheader', text: subText });
                 } else if (child.classList.contains('checklist-item')) {
-                    order.items[categoryName].push({ type: 'item', text: child.getAttribute('data-text') });
+                    const itemInput = child.querySelector('.item-input');
+                    const itemText = itemInput ? itemInput.value : child.getAttribute('data-text');
+                    order.items[categoryName].push({ type: 'item', text: itemText });
                 }
             }
         });
         
         localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-    }
-
-    // Load custom layout order or fallback to default
-    function getSavedOrder() {
-        const saved = localStorage.getItem('fujirock_checklist_order');
-        if (saved) {
-            return JSON.parse(saved);
-        }
-        
-        // Generate default order structure if not already saved
-        const order = {
-            categories: Object.keys(packingList),
-            items: {}
-        };
-        for (const [category, categoryData] of Object.entries(packingList)) {
-            order.items[category] = [];
-            for (const [subheader, items] of Object.entries(categoryData)) {
-                if (subheader) {
-                    order.items[category].push({ type: 'subheader', text: subheader });
-                }
-                items.forEach(item => {
-                    order.items[category].push({ type: 'item', text: item });
-                });
-            }
-        }
-        localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-        return order;
     }
 
     // Toggle collapse/expand status of a category card
@@ -667,6 +765,128 @@
             collapsedCategories.add(category);
         }
         localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+    }
+
+    // Toggle Edit Mode
+    function toggleEditMode() {
+        editMode = !editMode;
+        const btns = document.querySelectorAll('#editToggleBtn, #editToggleBtnBottom');
+        btns.forEach(btn => {
+            if (editMode) {
+                btn.innerText = '✓ 완료';
+                btn.style.backgroundColor = 'var(--primary)';
+                btn.style.color = '#FFFFFF';
+            } else {
+                btn.innerText = '✏️ 편집 모드';
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--primary)';
+            }
+        });
+        renderChecklist();
+    }
+
+    // Category renaming
+    function renameCategory(oldName, newName) {
+        if (!newName || newName.trim() === '') return;
+        newName = newName.trim();
+        if (oldName === newName) return;
+
+        const order = getSavedOrder();
+        const index = order.categories.indexOf(oldName);
+        if (index !== -1) {
+            order.categories[index] = newName;
+            order.items[newName] = order.items[oldName];
+            delete order.items[oldName];
+
+            if (collapsedCategories.has(oldName)) {
+                collapsedCategories.delete(oldName);
+                collapsedCategories.add(newName);
+                localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+            }
+
+            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            renderChecklist();
+        }
+    }
+
+    // Category deletion
+    function deleteCategory(category) {
+        if (!confirm(`"${category}" 카테고리를 정말 삭제하시겠습니까?`)) return;
+        const order = getSavedOrder();
+        const index = order.categories.indexOf(category);
+        if (index !== -1) {
+            order.categories.splice(index, 1);
+            delete order.items[category];
+
+            if (collapsedCategories.has(category)) {
+                collapsedCategories.delete(category);
+                localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+            }
+
+            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            renderChecklist();
+        }
+    }
+
+    // Item/subheader renaming
+    function renameItem(category, index, newText) {
+        if (!newText || newText.trim() === '') return;
+        newText = newText.trim();
+
+        const order = getSavedOrder();
+        if (order.items[category] && order.items[category][index]) {
+            const oldText = order.items[category][index].text;
+            if (oldText === newText) return;
+
+            order.items[category][index].text = newText;
+
+            if (order.items[category][index].type === 'item') {
+                if (checkedItems.has(oldText)) {
+                    checkedItems.delete(oldText);
+                    checkedItems.add(newText);
+                    localStorage.setItem('fujirock_checked_items', JSON.stringify(Array.from(checkedItems)));
+                }
+            }
+
+            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            renderChecklist();
+        }
+    }
+
+    // Item/subheader deletion
+    function deleteItem(category, index) {
+        const order = getSavedOrder();
+        if (order.items[category] && order.items[category][index]) {
+            const node = order.items[category][index];
+            if (node.type === 'item' && checkedItems.has(node.text)) {
+                checkedItems.delete(node.text);
+                localStorage.setItem('fujirock_checked_items', JSON.stringify(Array.from(checkedItems)));
+            }
+            order.items[category].splice(index, 1);
+            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            renderChecklist();
+        }
+    }
+
+    // Add item or subheader inside category
+    function addItemToCategory(category, type) {
+        const order = getSavedOrder();
+        if (order.items[category]) {
+            const defaultText = type === 'subheader' ? '새 소제목' : '새 준비물';
+            order.items[category].push({ type: type, text: defaultText });
+            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            renderChecklist();
+        }
+    }
+
+    // Add new Category card
+    function addNewCategory() {
+        const order = getSavedOrder();
+        const newCatName = `새 카테고리 ${order.categories.length + 1}`;
+        order.categories.push(newCatName);
+        order.items[newCatName] = [];
+        localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+        renderChecklist();
     }
 
     // Initialize list and render in DOM
@@ -688,13 +908,14 @@
             const header = document.createElement('div');
             header.className = 'category-header';
             header.addEventListener('click', (e) => {
-                if (e.target.closest('.drag-handle')) return; // ignore click on drag handle
+                if (e.target.closest('.drag-handle') || e.target.closest('.btn-delete') || e.target.closest('input')) return; // ignore layout events
                 toggleCategory(category);
             });
 
             const titleContainer = document.createElement('div');
             titleContainer.style.display = 'flex';
             titleContainer.style.alignItems = 'center';
+            titleContainer.style.flexGrow = '1';
 
             // Drag handle for Category Card (SVG dots)
             const dragHandle = document.createElement('div');
@@ -711,10 +932,30 @@
             `;
             titleContainer.appendChild(dragHandle);
 
-            const title = document.createElement('span');
-            title.className = 'category-title';
-            title.innerText = category;
-            titleContainer.appendChild(title);
+            if (editMode) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'edit-input category-title-input';
+                input.value = category;
+                input.style.fontWeight = 'bold';
+                input.style.fontSize = '1.25rem';
+                input.style.color = 'var(--primary)';
+                input.style.border = 'none';
+                input.style.background = 'transparent';
+                input.style.width = '70%';
+                input.addEventListener('change', () => {
+                    renameCategory(category, input.value);
+                });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') input.blur();
+                });
+                titleContainer.appendChild(input);
+            } else {
+                const title = document.createElement('span');
+                title.className = 'category-title';
+                title.innerText = category;
+                titleContainer.appendChild(title);
+            }
             header.appendChild(titleContainer);
 
             // Badge and arrow container
@@ -723,10 +964,22 @@
             badgeContainer.style.alignItems = 'center';
             badgeContainer.style.gap = '10px';
 
-            const badge = document.createElement('span');
-            badge.className = 'category-badge';
-            badge.id = `badge-${category}`;
-            badgeContainer.appendChild(badge);
+            if (editMode) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-delete';
+                deleteBtn.innerHTML = '🗑';
+                deleteBtn.title = '카테고리 삭제';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteCategory(category);
+                });
+                badgeContainer.appendChild(deleteBtn);
+            } else {
+                const badge = document.createElement('span');
+                badge.className = 'category-badge';
+                badge.id = `badge-${category}`;
+                badgeContainer.appendChild(badge);
+            }
 
             const arrow = document.createElement('span');
             arrow.className = 'toggle-arrow';
@@ -750,7 +1003,7 @@
             // Track if current item should be nested under a subheading
             let activeSubheader = false;
 
-            categoryItems.forEach(node => {
+            categoryItems.forEach((node, itemIndex) => {
                 if (node.type === 'subheader') {
                     activeSubheader = node.text;
                     const subHeaderDiv = document.createElement('div');
@@ -763,6 +1016,7 @@
                     subHeaderDiv.style.marginTop = '12px';
                     subHeaderDiv.style.marginBottom = '6px';
                     subHeaderDiv.style.fontSize = '1.05rem';
+                    subHeaderDiv.style.width = '100%';
 
                     // Subheader drag handle
                     const subHandle = document.createElement('div');
@@ -779,9 +1033,38 @@
                     `;
                     subHeaderDiv.appendChild(subHandle);
 
-                    const subTextSpan = document.createElement('span');
-                    subTextSpan.innerText = `— ${node.text}`;
-                    subHeaderDiv.appendChild(subTextSpan);
+                    if (editMode) {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'edit-input subheader-input';
+                        input.value = node.text;
+                        input.style.fontWeight = 'bold';
+                        input.style.color = 'var(--accent)';
+                        input.style.border = 'none';
+                        input.style.background = 'transparent';
+                        input.style.marginLeft = '5px';
+                        input.style.flexGrow = '1';
+                        input.addEventListener('change', () => {
+                            renameItem(category, itemIndex, input.value);
+                        });
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') input.blur();
+                        });
+                        subHeaderDiv.appendChild(input);
+
+                        // Delete button
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'btn-delete';
+                        deleteBtn.innerHTML = '🗑';
+                        deleteBtn.addEventListener('click', () => {
+                            deleteItem(category, itemIndex);
+                        });
+                        subHeaderDiv.appendChild(deleteBtn);
+                    } else {
+                        const subTextSpan = document.createElement('span');
+                        subTextSpan.innerText = `— ${node.text}`;
+                        subHeaderDiv.appendChild(subTextSpan);
+                    }
 
                     list.appendChild(subHeaderDiv);
                 } else if (node.type === 'item') {
@@ -820,26 +1103,93 @@
                         toggleItem(node.text, checkbox.checked);
                     });
 
-                    const text = document.createElement('span');
-                    text.className = 'item-text';
-                    text.innerText = node.text;
-                    text.style.cursor = 'pointer';
-                    text.addEventListener('click', () => {
-                        checkbox.checked = !checkbox.checked;
-                        toggleItem(node.text, checkbox.checked);
-                    });
+                    if (editMode) {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'edit-input item-input';
+                        input.value = node.text;
+                        input.style.border = 'none';
+                        input.style.background = 'transparent';
+                        input.style.flexGrow = '1';
+                        input.addEventListener('change', () => {
+                            renameItem(category, itemIndex, input.value);
+                        });
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') input.blur();
+                        });
+                        label.appendChild(input);
 
-                    label.appendChild(checkbox);
-                    label.appendChild(checkmark);
-                    label.appendChild(text);
+                        // Delete button
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'btn-delete';
+                        deleteBtn.innerHTML = '🗑';
+                        deleteBtn.addEventListener('click', () => {
+                            deleteItem(category, itemIndex);
+                        });
+                        label.appendChild(deleteBtn);
+                    } else {
+                        const text = document.createElement('span');
+                        text.className = 'item-text';
+                        text.innerText = node.text;
+                        text.style.cursor = 'pointer';
+                        text.addEventListener('click', () => {
+                            checkbox.checked = !checkbox.checked;
+                            toggleItem(node.text, checkbox.checked);
+                        });
+
+                        label.appendChild(checkbox);
+                        label.appendChild(checkmark);
+                        label.appendChild(text);
+                    }
 
                     list.appendChild(label);
                 }
             });
 
             content.appendChild(list);
+
+            if (editMode) {
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'edit-controls-container';
+
+                const addSubheaderBtn = document.createElement('button');
+                addSubheaderBtn.className = 'btn-add-item';
+                addSubheaderBtn.innerText = '＋ 소제목 추가';
+                addSubheaderBtn.addEventListener('click', () => {
+                    addItemToCategory(category, 'subheader');
+                });
+
+                const addItemBtn = document.createElement('button');
+                addItemBtn.className = 'btn-add-item';
+                addItemBtn.innerText = '＋ 준비물 추가';
+                addItemBtn.addEventListener('click', () => {
+                    addItemToCategory(category, 'item');
+                });
+
+                controlsDiv.appendChild(addSubheaderBtn);
+                controlsDiv.appendChild(addItemBtn);
+                content.appendChild(controlsDiv);
+            }
+
             card.appendChild(content);
             container.appendChild(card);
+        }
+
+        if (editMode) {
+            const addCatContainer = document.createElement('div');
+            addCatContainer.style.display = 'flex';
+            addCatContainer.style.justifyContent = 'center';
+            addCatContainer.style.marginTop = '20px';
+
+            const addCatBtn = document.createElement('button');
+            addCatBtn.className = 'btn-reset';
+            addCatBtn.style.borderColor = 'var(--primary)';
+            addCatBtn.style.color = 'var(--primary)';
+            addCatBtn.innerText = '＋ 새 카테고리 추가';
+            addCatBtn.addEventListener('click', addNewCategory);
+
+            addCatContainer.appendChild(addCatBtn);
+            container.appendChild(addCatContainer);
         }
 
         // Initialize custom Pointer Events based sorting on list containers
@@ -908,8 +1258,25 @@
         }
 
         const fillPercent = grandTotal > 0 ? (grandChecked / grandTotal) * 100 : 0;
-        document.getElementById('progressFill').style.width = `${fillPercent}%`;
-        document.getElementById('progressText').innerText = `진행률: ${grandChecked}/${grandTotal}`;
+        
+        const fillBar = document.getElementById('progressFill');
+        if (fillBar) fillBar.style.width = `${fillPercent}%`;
+        
+        const pText = document.getElementById('progressText');
+        if (pText) pText.innerText = `진행률: ${Math.round(fillPercent)}%`;
+        
+        const cText = document.getElementById('checkedCountText');
+        if (cText) cText.innerText = `선택된 항목: ${grandChecked} / ${grandTotal}`;
+
+        // Circular progress ring updates
+        const ringFill = document.getElementById('progressRingFill');
+        const ringText = document.getElementById('progressRingText');
+        if (ringFill && ringText) {
+            const circumference = 163.36;
+            const offset = circumference * (1 - fillPercent / 100);
+            ringFill.style.strokeDashoffset = offset;
+            ringText.innerText = `${Math.round(fillPercent)}%`;
+        }
     }
 
     // Clear state
@@ -942,17 +1309,13 @@
 
             categoryItems.forEach(node => {
                 if (node.type === 'subheader') {
-                    // 이전 서브헤더에 체크된 항목이 있었으면 추가
-                    if (lastSubheader && subheaderHasItems) {
-                        // already pushed
-                    }
                     lastSubheader = node;
                     subheaderHasItems = false;
                 } else if (node.type === 'item') {
                     allTotal++;
                     if (checkedItems.has(node.text)) {
                         checkedTotal++;
-                        // 서브헤더가 아직 추가되지 않았으면 먼저 추가
+                        // Add subheader if not already added for this group
                         if (lastSubheader && !subheaderHasItems) {
                             filtered.push(lastSubheader);
                             subheaderHasItems = true;
@@ -972,7 +1335,7 @@
             return;
         }
 
-        // 2) 캔버스 높이 계산 (선택된 항목 수 기준)
+        // 2) Compute canvas height dynamically
         let numLines = 0;
         let numSubheaders = 0;
         filteredData.forEach(cat => {
@@ -1029,7 +1392,7 @@
         ctx.lineTo(canvas.width - 60, 220);
         ctx.stroke();
 
-        // 3) 선택된 항목만 그리기
+        // 3) Draw only checked items
         let currY = 260;
         const xLeft = 80;
 
@@ -1080,13 +1443,13 @@
             currY += 20;
         }
 
-        // Footer
+        // Draw footer
         ctx.fillStyle = '#505060';
         ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('만든이 @sigong © 2026', canvas.width / 2, canvas.height - 40);
 
-        // Download
+        // Download trigger
         try {
             const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
             const link = document.createElement('a');
