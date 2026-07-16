@@ -1241,21 +1241,7 @@
             container.appendChild(addCatContainer);
         }
 
-        // Initialize custom Pointer Events based sorting on list containers
-        makeSortable(container, {
-            rowSelector: '.category-card',
-            handleSelector: '.category-drag-handle',
-            type: 'category'
-        });
 
-        const lists = document.querySelectorAll('.checklist-list');
-        lists.forEach(list => {
-            makeSortable(list, {
-                rowSelector: '.checklist-item, .checklist-subheader',
-                handleSelector: '.item-drag-handle',
-                type: 'item'
-            });
-        });
 
         // Handle autofocus of newly added elements
         if (typeof focusAfterRender !== 'undefined' && focusAfterRender !== null) {
@@ -1561,8 +1547,39 @@
         ctx.closePath();
     }
 
-    // Initialize list on load
-    window.onload = renderChecklist;
+    // Initialize list and setup drag event listeners once on load
+    window.onload = () => {
+        const container = document.getElementById('checklistCategories');
+
+        // Category drag listener (once)
+        makeSortable(container, {
+            rowSelector: '.category-card',
+            handleSelector: '.category-drag-handle',
+            type: 'category'
+        });
+
+        // Item/Subheader drag listener (once, delegated from container)
+        container.addEventListener('pointerdown', e => {
+            if (e.button != null && e.button !== 0) return;
+            const handle = e.target.closest('.item-drag-handle');
+            if (!handle || !container.contains(handle)) return;
+
+            const list = handle.closest('.checklist-list');
+            if (!list) return;
+
+            const row = handle.closest('.checklist-item, .checklist-subheader');
+            if (!row) return;
+
+            e.preventDefault();
+            startDrag(list, row, handle, e, {
+                rowSelector: '.checklist-item, .checklist-subheader',
+                handleSelector: '.item-drag-handle',
+                type: 'item'
+            });
+        });
+
+        renderChecklist();
+    };
 </script>
 </body>
 </html>
