@@ -552,6 +552,7 @@
     };
 
     let editMode = false;
+    let focusAfterRender = null;
 
     // Load custom layout order or fallback to default
     function getSavedOrder() {
@@ -787,9 +788,8 @@
 
     // Category renaming
     function renameCategory(oldName, newName) {
-        if (!newName || newName.trim() === '') return;
-        newName = newName.trim();
-        if (oldName === newName) return;
+        newName = (newName || '').trim();
+        if (!newName || oldName === newName) return;
 
         const order = getSavedOrder();
         const index = order.categories.indexOf(oldName);
@@ -830,8 +830,7 @@
 
     // Item/subheader renaming
     function renameItem(category, index, newText) {
-        if (!newText || newText.trim() === '') return;
-        newText = newText.trim();
+        newText = (newText || '').trim();
 
         const order = getSavedOrder();
         if (order.items[category] && order.items[category][index]) {
@@ -843,7 +842,7 @@
             if (order.items[category][index].type === 'item') {
                 if (checkedItems.has(oldText)) {
                     checkedItems.delete(oldText);
-                    checkedItems.add(newText);
+                    if (newText) checkedItems.add(newText);
                     localStorage.setItem('fujirock_checked_items', JSON.stringify(Array.from(checkedItems)));
                 }
             }
@@ -872,9 +871,12 @@
     function addItemToCategory(category, type) {
         const order = getSavedOrder();
         if (order.items[category]) {
-            const defaultText = type === 'subheader' ? '새 소제목' : '새 준비물';
-            order.items[category].push({ type: type, text: defaultText });
+            order.items[category].push({ type: type, text: '' });
             localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            
+            // Set focus flag for this index
+            focusAfterRender = { category: category, index: order.items[category].length - 1 };
+            
             renderChecklist();
         }
     }
@@ -886,6 +888,9 @@
         order.categories.push(newCatName);
         order.items[newCatName] = [];
         localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+        
+        focusAfterRender = { category: newCatName, index: 'name' };
+        
         renderChecklist();
     }
 
@@ -1038,6 +1043,7 @@
                         input.type = 'text';
                         input.className = 'edit-input subheader-input';
                         input.value = node.text;
+                        input.placeholder = '소제목 입력';
                         input.style.fontWeight = 'bold';
                         input.style.color = 'var(--accent)';
                         input.style.border = 'none';
@@ -1062,7 +1068,11 @@
                         subHeaderDiv.appendChild(deleteBtn);
                     } else {
                         const subTextSpan = document.createElement('span');
-                        subTextSpan.innerText = `— ${node.text}`;
+                        subTextSpan.innerText = node.text ? `— ${node.text}` : '— (소제목 없음)';
+                        if (!node.text) {
+                            subTextSpan.style.color = 'var(--text-sub)';
+                            subTextSpan.style.fontStyle = 'italic';
+                        }
                         subHeaderDiv.appendChild(subTextSpan);
                     }
 
@@ -1108,6 +1118,7 @@
                         input.type = 'text';
                         input.className = 'edit-input item-input';
                         input.value = node.text;
+                        input.placeholder = '준비물 입력';
                         input.style.border = 'none';
                         input.style.background = 'transparent';
                         input.style.flexGrow = '1';
@@ -1130,7 +1141,11 @@
                     } else {
                         const text = document.createElement('span');
                         text.className = 'item-text';
-                        text.innerText = node.text;
+                        text.innerText = node.text || '(이름 없음)';
+                        if (!node.text) {
+                            text.style.color = 'var(--text-sub)';
+                            text.style.fontStyle = 'italic';
+                        }
                         text.style.cursor = 'pointer';
                         text.addEventListener('click', () => {
                             checkbox.checked = !checkbox.checked;
@@ -1207,6 +1222,40 @@
                 type: 'item'
             });
         });
+
+        // Handle autofocus of newly added elements
+        if (typeof focusAfterRender !== 'undefined' && focusAfterRender !== null) {
+            const { category, index } = focusAfterRender;
+            focusAfterRender = null;
+
+            const card = document.getElementById(`card-${category}`);
+            if (card) {
+                // Ensure card is expanded to make inputs visible/focusable
+                card.classList.remove('collapsed');
+                collapsedCategories.delete(category);
+                localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+
+                if (index === 'name') {
+                    const input = card.querySelector('.category-title-input');
+                    if (input) {
+                        input.focus();
+                        input.select();
+                    }
+                } else {
+                    const list = card.querySelector('.checklist-list');
+                    if (list) {
+                        const children = list.children;
+                        const targetChild = children[index];
+                        if (targetChild) {
+                            const input = targetChild.querySelector('input[type="text"]');
+                            if (input) {
+                                input.focus();
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         updateProgress();
     }
