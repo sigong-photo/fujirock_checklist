@@ -559,6 +559,26 @@
         const saved = localStorage.getItem('fujirock_checklist_order');
         if (saved) {
             let order = JSON.parse(saved);
+            
+            // Checkbox State Migration: Convert old fujirock_checked_items Set to inline properties
+            const legacyCheckedRaw = localStorage.getItem('fujirock_checked_items');
+            if (legacyCheckedRaw) {
+                try {
+                    const legacyChecked = JSON.parse(legacyCheckedRaw);
+                    const checkedSet = new Set(legacyChecked);
+                    for (const category of order.categories) {
+                        const items = order.items[category] || [];
+                        items.forEach(node => {
+                            if (node.type === 'item' && checkedSet.has(node.text)) {
+                                node.checked = true;
+                            }
+                        });
+                    }
+                    localStorage.removeItem('fujirock_checked_items');
+                    localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+                } catch (e) {}
+            }
+
             // LocalStorage Migration: Update old subheader names to keep existing sessions synced
             if (order.items && order.items["당일 챙길 것"]) {
                 order.items["당일 챙길 것"] = order.items["당일 챙길 것"].map(node => {
@@ -600,6 +620,17 @@
             categories: Object.keys(packingList),
             items: {}
         };
+
+        // Checkbox State Migration for fresh load fallback
+        const legacyCheckedRaw = localStorage.getItem('fujirock_checked_items');
+        let checkedSet = new Set();
+        if (legacyCheckedRaw) {
+            try {
+                checkedSet = new Set(JSON.parse(legacyCheckedRaw));
+                localStorage.removeItem('fujirock_checked_items');
+            } catch (e) {}
+        }
+
         for (const [category, categoryData] of Object.entries(packingList)) {
             order.items[category] = [];
             for (const [subheader, items] of Object.entries(categoryData)) {
@@ -607,7 +638,7 @@
                     order.items[category].push({ type: 'subheader', text: subheader });
                 }
                 items.forEach(item => {
-                    order.items[category].push({ type: 'item', text: item });
+                    order.items[category].push({ type: 'item', text: item, checked: checkedSet.has(item) });
                 });
             }
         }
@@ -615,19 +646,7 @@
         return order;
     }
 
-    // Filter checked items from localStorage based on saved layout structure
     const currentOrder = getSavedOrder();
-    const allPackingItems = new Set();
-    for (const category of currentOrder.categories) {
-        const items = currentOrder.items[category] || [];
-        items.forEach(node => {
-            if (node.type === 'item') {
-                allPackingItems.add(node.text);
-            }
-        });
-    }
-    const savedItems = JSON.parse(localStorage.getItem('fujirock_checked_items') || '[]');
-    let checkedItems = new Set(savedItems.filter(item => allPackingItems.has(item)));
 
     // Load collapsed preference from localStorage, default all collapsed on first run
     const hasCollapsedPref = localStorage.getItem('fujirock_collapsed_categories');
@@ -832,6 +851,12 @@
         if (!newName || oldName === newName) return;
 
         const order = getSavedOrder();
+        if (order.categories.includes(newName)) {
+            alert('이미 존재하는 카테고리 이름입니다.');
+            renderChecklist();
+            return;
+        }
+
         const index = order.categories.indexOf(oldName);
         if (index !== -1) {
             order.categories[index] = newName;
@@ -879,14 +904,6 @@
 
             order.items[category][index].text = newText;
 
-            if (order.items[category][index].type === 'item') {
-                if (checkedItems.has(oldText)) {
-                    checkedItems.delete(oldText);
-                    if (newText) checkedItems.add(newText);
-                    localStorage.setItem('fujirock_checked_items', JSON.stringify(Array.from(checkedItems)));
-                }
-            }
-
             localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
             renderChecklist();
         }
@@ -896,11 +913,6 @@
     function deleteItem(category, index) {
         const order = getSavedOrder();
         if (order.items[category] && order.items[category][index]) {
-            const node = order.items[category][index];
-            if (node.type === 'item' && checkedItems.has(node.text)) {
-                checkedItems.delete(node.text);
-                localStorage.setItem('fujirock_checked_items', JSON.stringify(Array.from(checkedItems)));
-            }
             order.items[category].splice(index, 1);
             localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
             renderChecklist();
@@ -1142,15 +1154,15 @@
 
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.checked = checkedItems.has(node.text);
-                    checkbox.addEventListener('change', () => toggleItem(node.text, checkbox.checked));
+                    checkbox.checked = !!node.checked;
+                    checkbox.addEventListener('change', () => toggleItem(category, itemIndex, checkbox.checked));
 
                     const checkmark = document.createElement('span');
                     checkmark.className = 'checkmark';
                     checkmark.style.cursor = 'pointer';
                     checkmark.addEventListener('click', () => {
                         checkbox.checked = !checkbox.checked;
-                        toggleItem(node.text, checkbox.checked);
+                        toggleItem(category, itemIndex, checkbox.checked);
                     });
 
                     if (editMode) {
@@ -1189,7 +1201,7 @@
                         text.style.cursor = 'pointer';
                         text.addEventListener('click', () => {
                             checkbox.checked = !checkbox.checked;
-                            toggleItem(node.text, checkbox.checked);
+                            toggleItem(category, itemIndex, checkbox.checked);
                         });
 
                         label.appendChild(checkbox);
@@ -1287,13 +1299,12 @@
     }
 
     // Toggle check status and sync to localStorage
-    function toggleItem(item, isChecked) {
-        if (isChecked) {
-            checkedItems.add(item);
-        } else {
-            checkedItems.delete(item);
+    function toggleItem(category, index, isChecked) {
+        const order = getSavedOrder();
+        if (order.items[category] && order.items[category][index]) {
+            order.items[category][index].checked = isChecked;
+            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
         }
-        localStorage.setItem('fujirock_checked_items', JSON.stringify(Array.from(checkedItems)));
         updateProgress();
     }
 
@@ -1312,7 +1323,7 @@
             categoryItems.forEach(node => {
                 if (node.type === 'item') {
                     catTotal++;
-                    if (checkedItems.has(node.text)) {
+                    if (node.checked) {
                         catChecked++;
                     }
                 }
@@ -1357,7 +1368,6 @@
     // Clear state
     function resetAll() {
         if (confirm("모든 체크 상태와 항목 순서를 초기화하시겠습니까?")) {
-            checkedItems.clear();
             localStorage.removeItem('fujirock_checked_items');
             localStorage.removeItem('fujirock_checklist_order');
             localStorage.removeItem('fujirock_collapsed_categories');
@@ -1388,7 +1398,7 @@
                     subheaderHasItems = false;
                 } else if (node.type === 'item') {
                     allTotal++;
-                    if (checkedItems.has(node.text)) {
+                    if (node.checked) {
                         checkedTotal++;
                         // Add subheader if not already added for this group
                         if (lastSubheader && !subheaderHasItems) {
