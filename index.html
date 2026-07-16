@@ -718,6 +718,12 @@
                 let targetList = container;
                 const lists = document.querySelectorAll('.checklist-list');
                 for (const list of lists) {
+                    // Skip list containers belonging to collapsed categories
+                    const card = list.closest('.category-card');
+                    if (card && card.classList.contains('collapsed')) {
+                        continue;
+                    }
+
                     const rList = list.getBoundingClientRect();
                     if (ev.clientY >= rList.top - 30 && ev.clientY <= rList.bottom + 30 &&
                         ev.clientX >= rList.left - 30 && ev.clientX <= rList.right + 30) {
