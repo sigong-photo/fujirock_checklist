@@ -923,29 +923,73 @@
 
     // Draw checklist as a downloadable high-quality mobile JPG image using Canvas API
     function saveAsImage() {
-        const canvas = document.createElement('canvas');
-        
-        // Dynamically compute height based on actual list sizes and subheaders to prevent clipping
-        const categories = Object.keys(packingList);
-        let totalItemsCount = 0;
-        let numSubheaders = 0;
-        for (const catData of Object.values(packingList)) {
-            for (const [subheader, items] of Object.entries(catData)) {
-                totalItemsCount += items.length;
-                if (subheader) numSubheaders++;
+        const currentOrder = getSavedOrder();
+
+        // 1) 체크된 항목만 카테고리별로 수집
+        const filteredData = [];
+        let checkedTotal = 0;
+        let allTotal = 0;
+
+        for (const category of currentOrder.categories) {
+            const categoryItems = currentOrder.items[category] || [];
+            const filtered = [];
+            let lastSubheader = null;
+            let subheaderHasItems = false;
+
+            categoryItems.forEach(node => {
+                if (node.type === 'subheader') {
+                    // 이전 서브헤더에 체크된 항목이 있었으면 추가
+                    if (lastSubheader && subheaderHasItems) {
+                        // already pushed
+                    }
+                    lastSubheader = node;
+                    subheaderHasItems = false;
+                } else if (node.type === 'item') {
+                    allTotal++;
+                    if (checkedItems.has(node.text)) {
+                        checkedTotal++;
+                        // 서브헤더가 아직 추가되지 않았으면 먼저 추가
+                        if (lastSubheader && !subheaderHasItems) {
+                            filtered.push(lastSubheader);
+                            subheaderHasItems = true;
+                        }
+                        filtered.push(node);
+                    }
+                }
+            });
+
+            if (filtered.length > 0) {
+                filteredData.push({ category, items: filtered });
             }
         }
-        const numCategories = categories.length;
-        
-        canvas.height = 250 + (totalItemsCount * 35) + (numSubheaders * 35) + (numCategories * 65) + 100;
-        
+
+        if (checkedTotal === 0) {
+            alert('선택된 항목이 없습니다. 체크박스를 선택한 후 다시 시도해주세요.');
+            return;
+        }
+
+        // 2) 캔버스 높이 계산 (선택된 항목 수 기준)
+        let numLines = 0;
+        let numSubheaders = 0;
+        filteredData.forEach(cat => {
+            cat.items.forEach(node => {
+                if (node.type === 'subheader') numSubheaders++;
+                else numLines++;
+            });
+        });
+        const numCategories = filteredData.length;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 250 + (numLines * 35) + (numSubheaders * 35) + (numCategories * 65) + 100;
+
         const ctx = canvas.getContext('2d');
 
-        // Background (#1A1A24)
+        // Background
         ctx.fillStyle = '#1A1A24';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Header (no emojis for perfect cross-platform text rendering stability)
+        // Header
         ctx.fillStyle = '#FF8A00';
         ctx.font = 'bold 36px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
         ctx.textAlign = 'center';
@@ -955,26 +999,23 @@
         ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
         ctx.fillText('후지록 페스티벌 준비물 체크리스트', canvas.width / 2, 110);
 
-        // Progress Calculations
-        const progressPct = totalItemsCount > 0 ? Math.round((checkedItems.size / totalItemsCount) * 100) : 0;
+        // Progress
+        const progressPct = allTotal > 0 ? Math.round((checkedTotal / allTotal) * 100) : 0;
 
-        // Progress bar container
         ctx.fillStyle = '#2D2D3D';
         drawRoundedRect(ctx, 80, 140, canvas.width - 160, 24, 12);
         ctx.fill();
 
-        // Progress bar fill
-        if (checkedItems.size > 0) {
+        if (checkedTotal > 0) {
             ctx.fillStyle = '#FF4B4B';
-            const fillWidth = ((canvas.width - 160) * checkedItems.size) / totalItemsCount;
+            const fillWidth = ((canvas.width - 160) * checkedTotal) / allTotal;
             drawRoundedRect(ctx, 80, 140, fillWidth, 24, 12);
             ctx.fill();
         }
 
-        // Progress text
         ctx.fillStyle = '#A0A0B0';
         ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-        ctx.fillText(`진행률: ${progressPct}% (${checkedItems.size} / ${totalItemsCount})`, canvas.width / 2, 195);
+        ctx.fillText(`진행률: ${progressPct}% (${checkedTotal} / ${allTotal})`, canvas.width / 2, 195);
 
         // Divider
         ctx.strokeStyle = '#3D3D4D';
@@ -984,23 +1025,21 @@
         ctx.lineTo(canvas.width - 60, 220);
         ctx.stroke();
 
-        // Draw categories & items using the current custom drag-and-drop order
+        // 3) 선택된 항목만 그리기
         let currY = 260;
         const xLeft = 80;
-        const currentOrder = getSavedOrder();
 
-        for (const category of currentOrder.categories) {
+        for (const catData of filteredData) {
             // Category header
             ctx.fillStyle = '#FF8A00';
             ctx.font = 'bold 26px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText(category, xLeft, currY);
+            ctx.fillText(catData.category, xLeft, currY);
             currY += 45;
 
-            const categoryItems = currentOrder.items[category] || [];
             let activeSubheader = false;
 
-            categoryItems.forEach(node => {
+            catData.items.forEach(node => {
                 if (node.type === 'subheader') {
                     activeSubheader = node.text;
                     ctx.fillStyle = '#FF4B4B';
@@ -1008,52 +1047,42 @@
                     ctx.fillText(`— ${node.text}`, xLeft + 10, currY);
                     currY += 35;
                 } else if (node.type === 'item') {
-                    const isChecked = checkedItems.has(node.text);
                     const boxSize = 20;
                     const boxX = activeSubheader ? xLeft + 20 : xLeft + 10;
-                    const boxY = currY - 18; // Align box with text line
+                    const boxY = currY - 18;
 
-                    if (isChecked) {
-                        // Draw checked checkbox
-                        ctx.fillStyle = '#FF4B4B';
-                        drawRoundedRect(ctx, boxX, boxY, boxSize, boxSize, 4);
-                        ctx.fill();
+                    // Draw checked checkbox
+                    ctx.fillStyle = '#FF4B4B';
+                    drawRoundedRect(ctx, boxX, boxY, boxSize, boxSize, 4);
+                    ctx.fill();
 
-                        // Draw checkmark lines
-                        ctx.strokeStyle = '#FFFFFF';
-                        ctx.lineWidth = 2.5;
-                        ctx.beginPath();
-                        ctx.moveTo(boxX + 5, boxY + 10);
-                        ctx.lineTo(boxX + 9, boxY + 14);
-                        ctx.lineTo(boxX + 15, boxY + 6);
-                        ctx.stroke();
-                    } else {
-                        // Draw empty checkbox
-                        ctx.strokeStyle = '#A0A0B0';
-                        ctx.lineWidth = 2;
-                        ctx.beginPath();
-                        drawRoundedRect(ctx, boxX, boxY, boxSize, boxSize, 4);
-                        ctx.stroke();
-                    }
+                    // Draw checkmark
+                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(boxX + 5, boxY + 10);
+                    ctx.lineTo(boxX + 9, boxY + 14);
+                    ctx.lineTo(boxX + 15, boxY + 6);
+                    ctx.stroke();
 
                     // Draw label text
-                    ctx.fillStyle = isChecked ? '#A0A0B0' : '#FFFFFF';
+                    ctx.fillStyle = '#FFFFFF';
                     ctx.font = '22px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
                     ctx.fillText(node.text, boxX + boxSize + 20, currY);
                     currY += 35;
                 }
             });
 
-            currY += 20; // Category spacer gap
+            currY += 20;
         }
 
-        // Draw footer
+        // Footer
         ctx.fillStyle = '#505060';
         ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('만든이 @sigong © 2026', canvas.width / 2, canvas.height - 40);
 
-        // Download trigger
+        // Download
         try {
             const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
             const link = document.createElement('a');
