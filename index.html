@@ -38,7 +38,7 @@
 
         /* Hero Header */
         .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('LGM3461.jpg');
+            background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('fujickeckbg.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -1532,9 +1532,9 @@
         });
         const numCategories = filteredData.length;
 
-        // Load custom banner image from safeStorage if it exists, fallback to default LGM3461.jpg
+        // Load custom banner image from safeStorage if it exists, fallback to default fujickeckbg.jpg
         const savedImage = safeStorage.getItem('fujirock_hero_image');
-        const bannerSrc = savedImage || 'LGM3461.jpg';
+        const bannerSrc = savedImage || 'fujickeckbg.jpg';
         if (bannerSrc) {
             const img = new Image();
             img.onload = () => {
