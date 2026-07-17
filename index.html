@@ -522,6 +522,12 @@
 </div>
 
 <script>
+    // Global Error Logger for webview debugging
+    window.onerror = function(message, source, lineno, colno, error) {
+        alert("JS Error: " + message + "\nLine: " + lineno + "\nSource: " + source);
+        return false;
+    };
+
     // Safe localStorage wrapper to prevent exceptions in Private Browsing / messenger webviews
     const safeStorage = {
         getItem(key) {
@@ -581,63 +587,67 @@
 
     // Load custom layout order or fallback to default
     function getSavedOrder() {
-        const saved = safeStorage.getItem('fujirock_checklist_order');
-        if (saved) {
-            let order = JSON.parse(saved);
-            
-            // Checkbox State Migration: Convert old fujirock_checked_items Set to inline properties
-            const legacyCheckedRaw = safeStorage.getItem('fujirock_checked_items');
-            if (legacyCheckedRaw) {
-                try {
-                    const legacyChecked = JSON.parse(legacyCheckedRaw);
-                    const checkedSet = new Set(legacyChecked);
-                    for (const category of order.categories) {
-                        const items = order.items[category] || [];
-                        items.forEach(node => {
-                            if (node.type === 'item' && checkedSet.has(node.text)) {
-                                node.checked = true;
-                            }
-                        });
-                    }
-                    safeStorage.removeItem('fujirock_checked_items');
-                    safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-                } catch (e) {}
-            }
-
-            // LocalStorage Migration: Update old subheader names to keep existing sessions synced
-            if (order.items && order.items["당일 챙길 것"]) {
-                order.items["당일 챙길 것"] = order.items["당일 챙길 것"].map(node => {
-                    if (node.type === 'subheader' && node.text === '<카드 지갑 (UnderTheSun)>') {
-                        node.text = '<카드 지갑>';
-                    }
-                    return node;
-                });
-            }
-            // LocalStorage Migration: Update category "회장 휴대용 배낭" to "공연장 휴대용 배낭"
-            if (order.categories) {
-                const idx = order.categories.indexOf("회장 휴대용 배낭");
-                if (idx !== -1) {
-                    order.categories[idx] = "공연장 휴대용 배낭";
+        try {
+            const saved = safeStorage.getItem('fujirock_checklist_order');
+            if (saved) {
+                let order = JSON.parse(saved);
+                
+                // Checkbox State Migration: Convert old fujirock_checked_items Set to inline properties
+                const legacyCheckedRaw = safeStorage.getItem('fujirock_checked_items');
+                if (legacyCheckedRaw) {
+                    try {
+                        const legacyChecked = JSON.parse(legacyCheckedRaw);
+                        const checkedSet = new Set(legacyChecked);
+                        for (const category of order.categories) {
+                            const items = order.items[category] || [];
+                            items.forEach(node => {
+                                if (node.type === 'item' && checkedSet.has(node.text)) {
+                                    node.checked = true;
+                                }
+                            });
+                        }
+                        safeStorage.removeItem('fujirock_checked_items');
+                        safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+                    } catch (e) {}
                 }
-                if (order.items && order.items["회장 휴대용 배낭"]) {
-                    order.items["공연장 휴대용 배낭"] = order.items["회장 휴대용 배낭"];
-                    delete order.items["회장 휴대용 배낭"];
-                }
-            }
-            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
 
-            const collapsedRaw = safeStorage.getItem('fujirock_collapsed_categories');
-            if (collapsedRaw) {
-                try {
-                    let collapsed = JSON.parse(collapsedRaw);
-                    const cIdx = collapsed.indexOf("회장 휴대용 배낭");
-                    if (cIdx !== -1) {
-                        collapsed[cIdx] = "공연장 휴대용 배낭";
-                        safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(collapsed));
+                // LocalStorage Migration: Update old subheader names to keep existing sessions synced
+                if (order.items && order.items["당일 챙길 것"]) {
+                    order.items["당일 챙길 것"] = order.items["당일 챙길 것"].map(node => {
+                        if (node.type === 'subheader' && node.text === '<카드 지갑 (UnderTheSun)>') {
+                            node.text = '<카드 지갑>';
+                        }
+                        return node;
+                    });
+                }
+                // LocalStorage Migration: Update category "회장 휴대용 배낭" to "공연장 휴대용 배낭"
+                if (order.categories) {
+                    const idx = order.categories.indexOf("회장 휴대용 배낭");
+                    if (idx !== -1) {
+                        order.categories[idx] = "공연장 휴대용 배낭";
                     }
-                } catch (e) {}
+                    if (order.items && order.items["회장 휴대용 배낭"]) {
+                        order.items["공연장 휴대용 배낭"] = order.items["회장 휴대용 배낭"];
+                        delete order.items["회장 휴대용 배낭"];
+                    }
+                }
+                safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+
+                const collapsedRaw = safeStorage.getItem('fujirock_collapsed_categories');
+                if (collapsedRaw) {
+                    try {
+                        let collapsed = JSON.parse(collapsedRaw);
+                        const cIdx = collapsed.indexOf("회장 휴대용 배낭");
+                        if (cIdx !== -1) {
+                            collapsed[cIdx] = "공연장 휴대용 배낭";
+                            safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(collapsed));
+                        }
+                    } catch (e) {}
+                }
+                return order;
             }
-            return order;
+        } catch (err) {
+            console.error("Error parsing saved checklist order:", err);
         }
         
         // Generate default order structure if not already saved
@@ -674,13 +684,17 @@
     const currentOrder = getSavedOrder();
 
     // Load collapsed preference from safeStorage, default all collapsed on first run
-    const hasCollapsedPref = safeStorage.getItem('fujirock_collapsed_categories');
     let collapsedCategories;
-    if (hasCollapsedPref === null) {
+    try {
+        const hasCollapsedPref = safeStorage.getItem('fujirock_collapsed_categories');
+        if (hasCollapsedPref === null) {
+            collapsedCategories = new Set(Object.keys(packingList));
+            safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+        } else {
+            collapsedCategories = new Set(JSON.parse(hasCollapsedPref));
+        }
+    } catch (e) {
         collapsedCategories = new Set(Object.keys(packingList));
-        safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
-    } else {
-        collapsedCategories = new Set(JSON.parse(hasCollapsedPref));
     }
 
     // Custom Pointer Events based Drag and Drop Engine (Supports desktop mouse & mobile touch natively)
