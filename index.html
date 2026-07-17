@@ -438,9 +438,18 @@
 
 <div class="container">
     <!-- Header -->
-    <div class="hero">
+    <div class="hero" id="heroContainer">
         <h1>🎸 FUJI ROCK FESTIVAL 🏔️</h1>
         <p>후지록 페스티벌 준비물 체크리스트로 완벽한 축제를 준비하세요!</p>
+        <div id="heroEditControls" style="display: none; margin-top: 15px; gap: 10px; justify-content: center;">
+            <button class="btn-reset" onclick="triggerHeroImageUpload()" style="font-size: 0.85rem; padding: 6px 12px; border-color: var(--primary); color: var(--primary); cursor: pointer;">
+                📷 배너 이미지 변경
+            </button>
+            <button id="heroResetBtn" class="btn-reset" onclick="resetHeroImage()" style="font-size: 0.85rem; padding: 6px 12px; display: none; cursor: pointer;">
+                🗑️ 배너 초기화
+            </button>
+        </div>
+        <input type="file" id="heroImageInput" accept="image/*" style="display: none;" onchange="handleHeroImageUpload(event)">
     </div>
 
     <!-- Status panel (Top) -->
@@ -887,8 +896,50 @@
                 btn.style.color = 'var(--primary)';
             }
         });
+        const heroControls = document.getElementById('heroEditControls');
+        if (heroControls) {
+            heroControls.style.display = editMode ? 'flex' : 'none';
+        }
         renderChecklist();
     }
+
+    // Hero Banner Image Customization
+    function loadHeroImage() {
+        const savedImage = safeStorage.getItem('fujirock_hero_image');
+        const hero = document.getElementById('heroContainer');
+        const resetBtn = document.getElementById('heroResetBtn');
+        if (savedImage) {
+            hero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${savedImage})`;
+            hero.style.backgroundSize = 'cover';
+            hero.style.backgroundPosition = 'center';
+            if (resetBtn) resetBtn.style.display = 'inline-block';
+        } else {
+            hero.style.backgroundImage = '';
+            if (resetBtn) resetBtn.style.display = 'none';
+        }
+    }
+
+    window.triggerHeroImageUpload = function() {
+        document.getElementById('heroImageInput').click();
+    };
+
+    window.handleHeroImageUpload = function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                safeStorage.setItem('fujirock_hero_image', base64);
+                loadHeroImage();
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    window.resetHeroImage = function() {
+        safeStorage.removeItem('fujirock_hero_image');
+        loadHeroImage();
+    };
 
     // Category renaming
     function renameCategory(oldName, newName) {
@@ -1416,8 +1467,10 @@
             safeStorage.removeItem('fujirock_checked_items');
             safeStorage.removeItem('fujirock_checklist_order');
             safeStorage.removeItem('fujirock_collapsed_categories');
+            safeStorage.removeItem('fujirock_hero_image');
             collapsedCategories = new Set(Object.keys(packingList));
             safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+            loadHeroImage();
             renderChecklist();
         }
     }
@@ -1476,6 +1529,23 @@
         });
         const numCategories = filteredData.length;
 
+        // Load custom banner image from safeStorage if it exists
+        const savedImage = safeStorage.getItem('fujirock_hero_image');
+        if (savedImage) {
+            const img = new Image();
+            img.onload = () => {
+                generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, img);
+            };
+            img.onerror = () => {
+                generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, null);
+            };
+            img.src = savedImage;
+        } else {
+            generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, null);
+        }
+    }
+
+    function generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, heroImg) {
         const canvas = document.createElement('canvas');
         canvas.width = 800;
         canvas.height = 250 + (numLines * 35) + (numSubheaders * 35) + (numCategories * 65) + 100;
@@ -1486,13 +1556,30 @@
         ctx.fillStyle = '#1A1A24';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Header
-        ctx.fillStyle = '#FF8A00';
+        // Header Background
+        if (heroImg) {
+            // Draw custom banner image covering header area (y = 0 to 120)
+            ctx.drawImage(heroImg, 0, 0, canvas.width, 120);
+            
+            // Draw dark overlay to ensure readability
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.fillRect(0, 0, canvas.width, 120);
+        } else {
+            // Draw default dark gradient background
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            grad.addColorStop(0, '#1A1A24');
+            grad.addColorStop(1, '#252538');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, 120);
+        }
+
+        // Header Title (centered)
+        ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 36px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('FUJI ROCK FESTIVAL', canvas.width / 2, 70);
 
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#A0A0B0';
         ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
         ctx.fillText('후지록 페스티벌 준비물 체크리스트', canvas.width / 2, 110);
 
@@ -1640,6 +1727,7 @@
             });
         });
 
+        loadHeroImage();
         renderChecklist();
     }
 
