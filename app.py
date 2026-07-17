@@ -159,6 +159,23 @@ def generate_checklist_image():
 def main():
     st.set_page_config(page_title="후지록 준비물 체크리스트", layout="centered")
     
+    # Sidebar User Guide
+    with st.sidebar:
+        st.title("ℹ️ 후지록 체크리스트 가이드")
+        st.markdown("""
+        ### 💡 기본 기능
+        * **체크리스트 관리:** 준비물을 선택하면 진행률 상태링과 진행률 백분율이 실시간 업데이트됩니다.
+        * **자동 저장:** 체크 상태, 정렬 상태, 배너 등 모든 변경사항은 브라우저에 즉시 안전하게 자동 저장됩니다.
+        
+        ### ✏️ 편집 모드 (커스터마이징)
+        * **항목 위치 변경:** `✏️ 편집 모드`를 누르고 좌측 손잡이(⠿)나 항목 자체를 마우스/손가락으로 드래그하여 순서를 마음대로 바꿀 수 있습니다.
+        * **나만의 배너 업로드:** 편집 모드 상태에서 상단 배너 영역의 `📷 배너 이미지 변경` 단추를 누르면 원하는 사진으로 커스텀 배너를 지정할 수 있습니다.
+        
+        ### 📸 이미지 내보내기 & 리셋
+        * **이미지로 저장 (JPG):** `📸 이미지로 저장` 단추를 누르면 내가 체크한 항목과 진행률(선택 항목 비율)이 담긴 고해상도 JPG 이미지 카드를 다운로드할 수 있어, 오프라인이나 락페 현장에서 사진첩으로 빠르게 볼 수 있습니다.
+        * **초기화:** 리스트 상태를 완전히 처음 기본값으로 되돌리고 싶을 때 사용합니다.
+        """)
+    
     # Inject JavaScript to localize the Streamlit menu and settings modal into Korean, and hide Development options
     components.html("""
     <script>

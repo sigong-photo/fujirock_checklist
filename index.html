@@ -443,6 +443,99 @@
                 width: 100%;
                 justify-content: center;
             }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 85%;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding: 25px;
+            color: var(--text-main);
+        }
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, #ff8a8a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+        }
+        .modal-close-btn:hover {
+            color: var(--primary);
+        }
+        .guide-section {
+            margin-bottom: 25px;
+        }
+        .guide-section h3 {
+            font-size: 1.05rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 600;
+            text-align: left;
+        }
+        .guide-section ul {
+            padding-left: 20px;
+            margin: 0;
+            text-align: left;
+        }
+        .guide-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            color: var(--text-sub);
+        }
+        .guide-section code {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: inherit;
         }
     </style>
 </head>
@@ -513,6 +606,10 @@
             </div>
 
             <div class="btn-group">
+                <button class="btn-reset" onclick="openGuideModal()"
+                    style="border-color: #4A90E2; color: #4A90E2;">
+                    ℹ️ 도움말
+                </button>
                 <button id="editToggleBtn" class="btn-reset" onclick="toggleEditMode()"
                     style="border-color: var(--primary); color: var(--primary);">
                     ✏️ 편집 모드
@@ -532,6 +629,10 @@
         <!-- Controls (Bottom) -->
         <div class="stats-panel" style="margin-top: 30px;">
             <div class="btn-group" style="justify-content: center; width: 100%;">
+                <button class="btn-reset" onclick="openGuideModal()"
+                    style="border-color: #4A90E2; color: #4A90E2;">
+                    ℹ️ 도움말
+                </button>
                 <button id="editToggleBtnBottom" class="btn-reset" onclick="toggleEditMode()"
                     style="border-color: var(--primary); color: var(--primary);">
                     ✏️ 편집 모드
@@ -557,6 +658,39 @@
                 &copy; 2026 | Inspired by c86tori
             </p>
         </footer>
+
+        <!-- Guide Modal -->
+        <div id="guideModal" class="modal-overlay" onclick="closeGuideModal(event)" style="display: none;">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>ℹ️ 후지록 체크리스트 사용 가이드</h2>
+                    <button class="modal-close-btn" onclick="closeGuideModal(null)">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="guide-section">
+                        <h3>💡 기본 기능</h3>
+                        <ul>
+                            <li><strong>✅ 체크리스트 관리:</strong> 준비물을 선택하면 진행률 상태링과 진행률 백분율이 실시간 업데이트됩니다.</li>
+                            <li><strong>💾 자동 저장:</strong> 체크 상태, 정렬 상태, 배너 등 모든 변경사항은 브라우저에 즉시 안전하게 자동 저장됩니다.</li>
+                        </ul>
+                    </div>
+                    <div class="guide-section">
+                        <h3>✏️ 편집 모드 (커스터마이징)</h3>
+                        <ul>
+                            <li><strong>↕️ 항목 위치 변경 (드래그):</strong> <code>✏️ 편집 모드</code>를 누르고 좌측 손잡이(⠿)나 항목 자체를 마우스/손가락으로 드래그하여 순서를 마음대로 바꿀 수 있습니다.</li>
+                            <li><strong>📷 나만의 배너 업로드:</strong> 편집 모드 상태에서 상단 배너 영역의 <code>📷 배너 이미지 변경</code> 단추를 누르면 원하는 사진으로 커스텀 배너를 지정할 수 있습니다.</li>
+                        </ul>
+                    </div>
+                    <div class="guide-section">
+                        <h3>📸 이미지 내보내기 & 리셋</h3>
+                        <ul>
+                            <li><strong>📸 이미지로 저장 (JPG):</strong> <code>📸 이미지로 저장</code> 단추를 누르면 내가 체크한 항목과 진행률(선택 항목 비율)이 담긴 고해상도 JPG 이미지 카드를 다운로드할 수 있어, 오프라인이나 락페 현장에서 사진첩으로 빠르게 볼 수 있습니다.</li>
+                            <li><strong>🔄 초기화:</strong> 리스트 상태를 완전히 처음 기본값으로 되돌리고 싶을 때 사용합니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1868,6 +2002,23 @@
 
             loadHeroImage();
             renderChecklist();
+        }
+
+        function openGuideModal() {
+            const modal = document.getElementById('guideModal');
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        function closeGuideModal(e) {
+            if (e && e.target !== e.currentTarget) return;
+            const modal = document.getElementById('guideModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
         }
 
         if (document.readyState === 'loading') {
