@@ -690,6 +690,28 @@
                     </div>
                 </div>
             </div>
+        <!-- Image Preview Modal -->
+        <div id="imageModal" class="modal-overlay" onclick="closeImageModal(event)" style="display: none;">
+            <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2>📸 저장용 이미지 미리보기</h2>
+                    <button class="modal-close-btn" onclick="closeImageModal(null)">&times;</button>
+                </div>
+                <div class="modal-body" style="text-align: center;">
+                    <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 15px; line-height: 1.4; text-align: left;">
+                        📱 <strong>아이폰/안드로이드</strong> 또는 <strong>카카오톡/인스타그램 웹뷰</strong> 환경에서는<br>
+                        아래 이미지를 <strong>길게 꾹 누른 뒤 [사진 앱에 추가]</strong> 또는 <strong>[이미지 저장]</strong>을 눌러 갤러리에 저장해 주세요!
+                    </p>
+                    <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #1A1A24; max-height: 50vh; overflow-y: auto; margin-bottom: 20px;">
+                        <img id="previewChecklistImage" src="" alt="Checklist Preview" style="width: 100%; height: auto; display: block;">
+                    </div>
+                    <div>
+                        <button class="btn-save" onclick="triggerNativeDownload()" style="width: auto; padding: 10px 24px; display: inline-flex; align-items: center; justify-content: center;">
+                            ⬇️ 이미지 직접 다운로드
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1939,9 +1961,23 @@
             ctx.textAlign = 'center';
             ctx.fillText('만든이 @sigong © 2026 | Inspired by c86tori', canvas.width / 2, canvas.height - 40);
 
-            // Download trigger
+            // Download trigger & Preview Modal popup
             try {
                 const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+                
+                // Show in preview modal first (highly recommended for iOS / Kakao / Instagram)
+                const previewImg = document.getElementById('previewChecklistImage');
+                previewImg.src = dataUrl;
+                
+                const modal = document.getElementById('imageModal');
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.classList.add('show');
+                }, 10);
+                
+                window.currentChecklistDataUrl = dataUrl;
+
+                // Attempt automatic download for desktop/compatible browsers
                 const link = document.createElement('a');
                 link.download = 'fujirock_checklist.jpg';
                 link.href = dataUrl;
@@ -2015,6 +2051,26 @@
         function closeGuideModal(e) {
             if (e && e.target !== e.currentTarget) return;
             const modal = document.getElementById('guideModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function triggerNativeDownload() {
+            if (window.currentChecklistDataUrl) {
+                const link = document.createElement('a');
+                link.download = 'fujirock_checklist.jpg';
+                link.href = window.currentChecklistDataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        function closeImageModal(e) {
+            if (e && e.target !== e.currentTarget) return;
+            const modal = document.getElementById('imageModal');
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
