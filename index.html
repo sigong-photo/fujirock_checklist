@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>후지록 페스티벌 준비물 체크리스트</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-color: #0E1117;
@@ -159,7 +162,7 @@
             border: 1px solid var(--border-color);
             border-radius: 16px;
             margin-bottom: 25px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             overflow: hidden;
             transition: border-color 0.3s ease;
             position: relative;
@@ -308,11 +311,11 @@
             flex-shrink: 0;
         }
 
-        .checklist-item:hover input[type="checkbox"] ~ .checkmark {
+        .checklist-item:hover input[type="checkbox"]~.checkmark {
             border-color: var(--text-main);
         }
 
-        .checklist-item input[type="checkbox"]:checked ~ .checkmark {
+        .checklist-item input[type="checkbox"]:checked~.checkmark {
             background-color: var(--accent);
             border-color: var(--accent);
         }
@@ -323,7 +326,7 @@
             display: none;
         }
 
-        .checklist-item input[type="checkbox"]:checked ~ .checkmark:after {
+        .checklist-item input[type="checkbox"]:checked~.checkmark:after {
             display: block;
         }
 
@@ -343,7 +346,7 @@
             transition: var(--transition);
         }
 
-        .checklist-item input[type="checkbox"]:checked ~ .item-text {
+        .checklist-item input[type="checkbox"]:checked~.item-text {
             color: var(--text-sub);
             text-decoration: line-through;
         }
@@ -423,15 +426,19 @@
             body {
                 padding: 20px 10px;
             }
+
             .hero h1 {
                 font-size: 1.8rem;
             }
+
             .stats-panel {
                 padding: 16px;
             }
+
             .btn-group {
                 flex-direction: column;
             }
+
             button {
                 width: 100%;
                 justify-content: center;
@@ -439,646 +446,656 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <!-- Header -->
-    <div class="hero" id="heroContainer">
-        <h1>🎸 FUJI ROCK FESTIVAL 🏔️</h1>
-        <p>후지록 페스티벌 준비물 체크리스트로 완벽한 축제를 준비하세요!</p>
-        <div id="heroEditControls" style="display: none; margin-top: 15px; gap: 10px; justify-content: center;">
-            <button class="btn-reset" onclick="triggerHeroImageUpload()" style="font-size: 0.85rem; padding: 6px 12px; border-color: var(--primary); color: var(--primary); cursor: pointer;">
-                📷 배너 이미지 변경
-            </button>
-            <button id="heroResetBtn" class="btn-reset" onclick="resetHeroImage()" style="font-size: 0.85rem; padding: 6px 12px; display: none; cursor: pointer;">
-                🗑️ 배너 초기화
-            </button>
+    <div class="container">
+        <!-- Header -->
+        <div class="hero" id="heroContainer">
+            <h1>🎸 FUJI ROCK FESTIVAL 🏔️</h1>
+            <p>후지록 페스티벌 준비물 체크리스트로 완벽한 축제를 준비하세요!</p>
+            <div id="heroEditControls" style="display: none; margin-top: 15px; gap: 10px; justify-content: center;">
+                <button class="btn-reset" onclick="triggerHeroImageUpload()"
+                    style="font-size: 0.85rem; padding: 6px 12px; border-color: var(--primary); color: var(--primary); cursor: pointer;">
+                    📷 배너 이미지 변경
+                </button>
+                <button id="heroResetBtn" class="btn-reset" onclick="resetHeroImage()"
+                    style="font-size: 0.85rem; padding: 6px 12px; display: none; cursor: pointer;">
+                    🗑️ 배너 초기화
+                </button>
+            </div>
+            <input type="file" id="heroImageInput" accept="image/*" style="display: none;"
+                onchange="handleHeroImageUpload(event)">
         </div>
-        <input type="file" id="heroImageInput" accept="image/*" style="display: none;" onchange="handleHeroImageUpload(event)">
-    </div>
 
-    <!-- Status panel (Top) -->
-    <div class="stats-panel">
-        <div class="progress-container">
-            <!-- Circular Progress Loader Ring -->
-            <div id="progressRingContainer" style="position: relative; width: 64px; height: 64px; flex-shrink: 0;">
-                <svg width="64" height="64" viewBox="0 0 64 64">
-                    <circle cx="32" cy="32" r="26" stroke="#2D2D3D" stroke-width="6" fill="transparent" />
-                    <circle id="progressRingFill" cx="32" cy="32" r="26" stroke="var(--accent)" stroke-width="6" fill="transparent"
-                            stroke-dasharray="163.36" stroke-dashoffset="163.36" stroke-linecap="round"
+        <!-- Status panel (Top) -->
+        <div class="stats-panel">
+            <div class="progress-container">
+                <!-- Circular Progress Loader Ring -->
+                <div id="progressRingContainer" style="position: relative; width: 64px; height: 64px; flex-shrink: 0;">
+                    <svg width="64" height="64" viewBox="0 0 64 64">
+                        <circle cx="32" cy="32" r="26" stroke="#2D2D3D" stroke-width="6" fill="transparent" />
+                        <circle id="progressRingFill" cx="32" cy="32" r="26" stroke="var(--accent)" stroke-width="6"
+                            fill="transparent" stroke-dasharray="163.36" stroke-dashoffset="163.36"
+                            stroke-linecap="round"
                             style="transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%;" />
-                </svg>
-                <div id="progressRingText" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 700; color: #FFFFFF;">0%</div>
+                    </svg>
+                    <div id="progressRingText"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 700; color: #FFFFFF;">
+                        0%</div>
+                </div>
+
+                <!-- Linear Progress bar -->
+                <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px;">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressFill"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                        <div style="color: var(--text-sub);" id="checkedCountText">선택된 항목: 0 / 74</div>
+                        <div class="progress-text" id="progressText" style="font-weight: 600;">진행률: 0%</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Linear Progress bar -->
-            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px;">
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" id="progressFill"></div>
+            <!-- Instruction Text with drag handle prefix -->
+            <div
+                style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-sub); font-size: 0.95rem; margin-top: -5px; margin-bottom: 5px;">
+                <div class="drag-handle" style="cursor: default; opacity: 0.4;">
+                    <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
+                        <circle cx="2.5" cy="3" r="1.5" stroke="none" />
+                        <circle cx="2.5" cy="9" r="1.5" stroke="none" />
+                        <circle cx="2.5" cy="15" r="1.5" stroke="none" />
+                        <circle cx="9.5" cy="3" r="1.5" stroke="none" />
+                        <circle cx="9.5" cy="9" r="1.5" stroke="none" />
+                        <circle cx="9.5" cy="15" r="1.5" stroke="none" />
+                    </svg>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
-                    <div style="color: var(--text-sub);" id="checkedCountText">선택된 항목: 0 / 74</div>
-                    <div class="progress-text" id="progressText" style="font-weight: 600;">진행률: 0%</div>
-                </div>
+                <span>손잡이로 드래그하여 정렬, 탭으로 확인</span>
             </div>
-        </div>
-        
-        <!-- Instruction Text with drag handle prefix -->
-        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-sub); font-size: 0.95rem; margin-top: -5px; margin-bottom: 5px;">
-            <div class="drag-handle" style="cursor: default; opacity: 0.4;">
-                <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
-                    <circle cx="2.5" cy="3" r="1.5" stroke="none" />
-                    <circle cx="2.5" cy="9" r="1.5" stroke="none" />
-                    <circle cx="2.5" cy="15" r="1.5" stroke="none" />
-                    <circle cx="9.5" cy="3" r="1.5" stroke="none" />
-                    <circle cx="9.5" cy="9" r="1.5" stroke="none" />
-                    <circle cx="9.5" cy="15" r="1.5" stroke="none" />
-                </svg>
+
+            <div class="btn-group">
+                <button id="editToggleBtn" class="btn-reset" onclick="toggleEditMode()"
+                    style="border-color: var(--primary); color: var(--primary);">
+                    ✏️ 편집 모드
+                </button>
+                <button class="btn-reset" onclick="resetAll()">
+                    🔄 초기화
+                </button>
+                <button class="btn-save" onclick="saveAsImage()">
+                    📸 이미지로 저장 (JPG)
+                </button>
             </div>
-            <span>손잡이로 드래그하여 정렬, 탭으로 확인</span>
         </div>
 
-        <div class="btn-group">
-            <button id="editToggleBtn" class="btn-reset" onclick="toggleEditMode()" style="border-color: var(--primary); color: var(--primary);">
-                ✏️ 편집 모드
-            </button>
-            <button class="btn-reset" onclick="resetAll()">
-                🔄 초기화
-            </button>
-            <button class="btn-save" onclick="saveAsImage()">
-                📸 이미지로 저장 (JPG)
-            </button>
+        <!-- Categories -->
+        <div id="checklistCategories"></div>
+
+        <!-- Controls (Bottom) -->
+        <div class="stats-panel" style="margin-top: 30px;">
+            <div class="btn-group" style="justify-content: center; width: 100%;">
+                <button id="editToggleBtnBottom" class="btn-reset" onclick="toggleEditMode()"
+                    style="border-color: var(--primary); color: var(--primary);">
+                    ✏️ 편집 모드
+                </button>
+                <button class="btn-reset" onclick="resetAll()">
+                    🔄 초기화
+                </button>
+                <button class="btn-save" onclick="saveAsImage()">
+                    📸 이미지로 저장 (JPG)
+                </button>
+            </div>
         </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>만든이 @sigong &copy; 2026 | Inspired by c86tori</p>
+        </footer>
     </div>
 
-    <!-- Categories -->
-    <div id="checklistCategories"></div>
+    <script>
+        // Global Error Logger for webview debugging
+        window.onerror = function (message, source, lineno, colno, error) {
+            alert("JS Error: " + message + "\nLine: " + lineno + "\nSource: " + source);
+            return false;
+        };
 
-    <!-- Controls (Bottom) -->
-    <div class="stats-panel" style="margin-top: 30px;">
-        <div class="btn-group" style="justify-content: center; width: 100%;">
-            <button id="editToggleBtnBottom" class="btn-reset" onclick="toggleEditMode()" style="border-color: var(--primary); color: var(--primary);">
-                ✏️ 편집 모드
-            </button>
-            <button class="btn-reset" onclick="resetAll()">
-                🔄 초기화
-            </button>
-            <button class="btn-save" onclick="saveAsImage()">
-                📸 이미지로 저장 (JPG)
-            </button>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <p>만든이 @sigong &copy; 2026 | Inspired by c86tori</p>
-    </footer>
-</div>
-
-<script>
-    // Global Error Logger for webview debugging
-    window.onerror = function(message, source, lineno, colno, error) {
-        alert("JS Error: " + message + "\nLine: " + lineno + "\nSource: " + source);
-        return false;
-    };
-
-    // Safe localStorage wrapper to prevent exceptions in Private Browsing / messenger webviews
-    const safeStorage = {
-        getItem(key) {
-            try {
-                return localStorage.getItem(key);
-            } catch (e) {
-                return this[key] || null;
+        // Safe localStorage wrapper to prevent exceptions in Private Browsing / messenger webviews
+        const safeStorage = {
+            getItem(key) {
+                try {
+                    return localStorage.getItem(key);
+                } catch (e) {
+                    return this[key] || null;
+                }
+            },
+            setItem(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    this[key] = value;
+                }
+            },
+            removeItem(key) {
+                try {
+                    localStorage.removeItem(key);
+                } catch (e) {
+                    delete this[key];
+                }
             }
-        },
-        setItem(key, value) {
-            try {
-                localStorage.setItem(key, value);
-            } catch (e) {
-                this[key] = value;
+        };
+
+        // Updated checklist matching the provided web URL (Translated to Korean, grouped with subheaders)
+        const packingList = {
+            "공연장 휴대용 배낭": {
+                "[배면 포켓]": ["선크림", "맥주 너클 오프너", "모기 퇴치 스프레이"],
+                "[사이드 포켓]": ["물병/텀블러"],
+                "[내용물]": ["수건", "판초 우의 (파랑)", "플리스"],
+                "<노란 파우치>": ["보조배터리", "USB 케이블류", "헤드랜턴", "AAA 건전지"],
+                "<빨간 파우치>": ["스포츠 테이핑 테이프", "대일밴드 (반창고)", "손톱깎이", "콘택트렌즈", "휴대용 티슈"]
+            },
+            "숙소 배낭": {
+                "[등 포켓]": ["지갑 (카드류 제외)"],
+                "[내용물]": ["비닐봉지", "페스티벌용 T셔츠 (3장)", "속옷 (1장)", "양말 (1켤레)", "여분 수건", "3일차 손수건", "헤어 스프레이", "스킨/토너", "크림", "면도기"]
+            },
+            "차에 두고 갈 것": {
+                "": ["에어매트", "미니 아이스박스", "접이식 우산"],
+                "[대시보드]": ["주차권", "손목밴드 (입장권)", "타임테이블"],
+                "[차박 박스]": ["바디 시트", "취침용 T셔츠", "속옷 (2장)", "양말 (1켤레)", "복귀용 여분 옷", "비닐봉지 (여분)", "2일차 수건", "3일차 수건", "막 쓰는 수건", "2일차 손수건 (빨아서 쓰기)", "모자 (캡)"],
+                "[기타 박스]": ["장화", "샌들", "차량용 햇빛 가리개"],
+                "[노란 배낭]": ["접이식 의자 (대)"]
+            },
+            "당일 챙길 것": {
+                "<카드 지갑>": ["건강보험증", "운전면허증", "현금"],
+                "<기타>": ["손수건", "집 열쇠", "차 열쇠", "애플워치", "애플워치 충전기/배터리", "멀티탭", "스킨/토너 (여행용)", "크림 (여행용)", "면도기 (여분)", "무선 이어폰"]
+            },
+            "당일 착용할 것": {
+                "": ["선글라스", "햇 (모자)", "기능성 이너웨어", "기능성 상의", "기능성 하의", "T셔츠", "속건성 바지", "속옷", "손수건", "스마트폰"]
             }
-        },
-        removeItem(key) {
+        };
+
+        let editMode = false;
+        let focusAfterRender = null;
+
+        // Load custom layout order or fallback to default
+        function getSavedOrder() {
             try {
-                localStorage.removeItem(key);
-            } catch (e) {
-                delete this[key];
-            }
-        }
-    };
+                const saved = safeStorage.getItem('fujirock_checklist_order');
+                if (saved) {
+                    let order = JSON.parse(saved);
 
-    // Updated checklist matching the provided web URL (Translated to Korean, grouped with subheaders)
-    const packingList = {
-        "공연장 휴대용 배낭": {
-            "[배면 포켓]": ["선크림", "페이스 시트", "맥주 너클 오프너", "모기 퇴치 스프레이"],
-            "[사이드 포켓]": ["물병/텀블러"],
-            "[내용물]": ["수건", "판초 우의 (파랑)", "플리스"],
-            "<노란 파우치>": ["보조배터리", "USB 케이블류", "헤드랜턴", "AAA 건전지"],
-            "<빨간 파우치>": ["스포츠 테이핑 테이프", "대일밴드 (반창고)", "손톱깎이", "콘택트렌즈", "휴대용 티슈"]
-        },
-        "숙소 배낭": {
-            "[등 포켓]": ["지갑 (카드류 제외)"],
-            "[내용물]": ["비닐봉지", "페스티벌용 T셔츠 (3장)", "속옷 (1장)", "양말 (1켤레)", "여분 수건", "3일차 손수건", "헤어 스프레이", "스킨/토너", "크림", "면도기"]
-        },
-        "차에 두고 갈 것": {
-            "": ["에어매트", "미니 아이스박스", "접이식 우산"],
-            "[대시보드]": ["주차권", "손목밴드 (입장권)", "타임테이블"],
-            "[차박 박스]": ["바디 시트", "취침용 T셔츠", "속옷 (2장)", "양말 (1켤레)", "복귀용 여분 옷", "비닐봉지 (여분)", "2일차 수건", "3일차 수건", "막 쓰는 수건", "2일차 손수건 (빨아서 쓰기)", "모자 (캡)"],
-            "[기타 박스]": ["장화", "샌들", "차량용 햇빛 가리개"],
-            "[노란 배낭]": ["접이식 의자 (대)"]
-        },
-        "당일 챙길 것": {
-            "<카드 지갑>": ["건강보험증", "운전면허증", "현금"],
-            "<기타>": ["손수건", "집 열쇠", "차 열쇠", "애플워치", "애플워치 충전기/배터리", "멀티탭", "스킨/토너 (여행용)", "크림 (여행용)", "면도기 (여분)", "무선 이어폰"]
-        },
-        "당일 착용할 것": {
-            "": ["선글라스", "햇 (모자)", "기능성 이너웨어", "기능성 상의", "기능성 하의", "T셔츠", "속건성 바지", "속옷", "손수건", "스마트폰"]
-        }
-    };
+                    // Checkbox State Migration: Convert old fujirock_checked_items Set to inline properties
+                    const legacyCheckedRaw = safeStorage.getItem('fujirock_checked_items');
+                    if (legacyCheckedRaw) {
+                        try {
+                            const legacyChecked = JSON.parse(legacyCheckedRaw);
+                            const checkedSet = new Set(legacyChecked);
+                            for (const category of order.categories) {
+                                const items = order.items[category] || [];
+                                items.forEach(node => {
+                                    if (node.type === 'item' && checkedSet.has(node.text)) {
+                                        node.checked = true;
+                                    }
+                                });
+                            }
+                            safeStorage.removeItem('fujirock_checked_items');
+                            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+                        } catch (e) { }
+                    }
 
-    let editMode = false;
-    let focusAfterRender = null;
-
-    // Load custom layout order or fallback to default
-    function getSavedOrder() {
-        try {
-            const saved = safeStorage.getItem('fujirock_checklist_order');
-            if (saved) {
-                let order = JSON.parse(saved);
-                
-                // Checkbox State Migration: Convert old fujirock_checked_items Set to inline properties
-                const legacyCheckedRaw = safeStorage.getItem('fujirock_checked_items');
-                if (legacyCheckedRaw) {
-                    try {
-                        const legacyChecked = JSON.parse(legacyCheckedRaw);
-                        const checkedSet = new Set(legacyChecked);
-                        for (const category of order.categories) {
-                            const items = order.items[category] || [];
-                            items.forEach(node => {
-                                if (node.type === 'item' && checkedSet.has(node.text)) {
-                                    node.checked = true;
-                                }
-                            });
+                    // LocalStorage Migration: Update old subheader names to keep existing sessions synced
+                    if (order.items && order.items["당일 챙길 것"]) {
+                        order.items["당일 챙길 것"] = order.items["당일 챙길 것"].map(node => {
+                            if (node.type === 'subheader' && node.text === '<카드 지갑 (UnderTheSun)>') {
+                                node.text = '<카드 지갑>';
+                            }
+                            return node;
+                        });
+                    }
+                    // LocalStorage Migration: Update category "회장 휴대용 배낭" to "공연장 휴대용 배낭"
+                    if (order.categories) {
+                        const idx = order.categories.indexOf("회장 휴대용 배낭");
+                        if (idx !== -1) {
+                            order.categories[idx] = "공연장 휴대용 배낭";
                         }
-                        safeStorage.removeItem('fujirock_checked_items');
-                        safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-                    } catch (e) {}
-                }
-
-                // LocalStorage Migration: Update old subheader names to keep existing sessions synced
-                if (order.items && order.items["당일 챙길 것"]) {
-                    order.items["당일 챙길 것"] = order.items["당일 챙길 것"].map(node => {
-                        if (node.type === 'subheader' && node.text === '<카드 지갑 (UnderTheSun)>') {
-                            node.text = '<카드 지갑>';
+                        if (order.items && order.items["회장 휴대용 배낭"]) {
+                            order.items["공연장 휴대용 배낭"] = order.items["회장 휴대용 배낭"];
+                            delete order.items["회장 휴대용 배낭"];
                         }
-                        return node;
-                    });
-                }
-                // LocalStorage Migration: Update category "회장 휴대용 배낭" to "공연장 휴대용 배낭"
-                if (order.categories) {
-                    const idx = order.categories.indexOf("회장 휴대용 배낭");
-                    if (idx !== -1) {
-                        order.categories[idx] = "공연장 휴대용 배낭";
                     }
-                    if (order.items && order.items["회장 휴대용 배낭"]) {
-                        order.items["공연장 휴대용 배낭"] = order.items["회장 휴대용 배낭"];
-                        delete order.items["회장 휴대용 배낭"];
+                    // LocalStorage Migration: Remove deleted items
+                    if (order.items && order.items["공연장 휴대용 배낭"]) {
+                        order.items["공연장 휴대용 배낭"] = order.items["공연장 휴대용 배낭"].filter(node => {
+                            return node.text !== "소염진통제 (로키소닌)" && node.text !== "파스 (로키소닌 패치)" && node.text !== "페이스 시트";
+                        });
                     }
+                    safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+
+                    const collapsedRaw = safeStorage.getItem('fujirock_collapsed_categories');
+                    if (collapsedRaw) {
+                        try {
+                            let collapsed = JSON.parse(collapsedRaw);
+                            const cIdx = collapsed.indexOf("회장 휴대용 배낭");
+                            if (cIdx !== -1) {
+                                collapsed[cIdx] = "공연장 휴대용 배낭";
+                                safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(collapsed));
+                            }
+                        } catch (e) { }
+                    }
+                    return order;
                 }
-                // LocalStorage Migration: Remove deleted items
-                if (order.items && order.items["공연장 휴대용 배낭"]) {
-                    order.items["공연장 휴대용 배낭"] = order.items["공연장 휴대용 배낭"].filter(node => {
-                        return node.text !== "소염진통제 (로키소닌)" && node.text !== "파스 (로키소닌 패치)";
-                    });
-                }
-                safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-
-                const collapsedRaw = safeStorage.getItem('fujirock_collapsed_categories');
-                if (collapsedRaw) {
-                    try {
-                        let collapsed = JSON.parse(collapsedRaw);
-                        const cIdx = collapsed.indexOf("회장 휴대용 배낭");
-                        if (cIdx !== -1) {
-                            collapsed[cIdx] = "공연장 휴대용 배낭";
-                            safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(collapsed));
-                        }
-                    } catch (e) {}
-                }
-                return order;
-            }
-        } catch (err) {
-            console.error("Error parsing saved checklist order:", err);
-        }
-        
-        // Generate default order structure if not already saved
-        const order = {
-            categories: Object.keys(packingList),
-            items: {}
-        };
-
-        // Checkbox State Migration for fresh load fallback
-        const legacyCheckedRaw = safeStorage.getItem('fujirock_checked_items');
-        let checkedSet = new Set();
-        if (legacyCheckedRaw) {
-            try {
-                checkedSet = new Set(JSON.parse(legacyCheckedRaw));
-                safeStorage.removeItem('fujirock_checked_items');
-            } catch (e) {}
-        }
-
-        for (const [category, categoryData] of Object.entries(packingList)) {
-            order.items[category] = [];
-            for (const [subheader, items] of Object.entries(categoryData)) {
-                if (subheader) {
-                    order.items[category].push({ type: 'subheader', text: subheader });
-                }
-                items.forEach(item => {
-                    order.items[category].push({ type: 'item', text: item, checked: checkedSet.has(item) });
-                });
-            }
-        }
-        safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-        return order;
-    }
-
-    const currentOrder = getSavedOrder();
-
-    // Load collapsed preference from safeStorage, default all collapsed on first run
-    let collapsedCategories;
-    try {
-        const hasCollapsedPref = safeStorage.getItem('fujirock_collapsed_categories');
-        if (hasCollapsedPref === null) {
-            collapsedCategories = new Set(Object.keys(packingList));
-            safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
-        } else {
-            collapsedCategories = new Set(JSON.parse(hasCollapsedPref));
-        }
-    } catch (e) {
-        collapsedCategories = new Set(Object.keys(packingList));
-    }
-
-    // Custom Pointer Events based Drag and Drop Engine (Supports desktop mouse & mobile touch natively)
-    function makeSortable(container, opts) {
-        container.addEventListener('pointerdown', e => {
-            if (e.button != null && e.button !== 0) return;
-            const handle = e.target.closest(opts.handleSelector);
-            if (!handle || !container.contains(handle)) return;
-            const row = handle.closest(opts.rowSelector);
-            if (!row) return;
-            e.preventDefault();
-            startDrag(container, row, handle, e, opts);
-        });
-    }
-
-    function startDrag(container, row, handle, e, opts) {
-        const rect = row.getBoundingClientRect();
-        const offsetY = e.clientY - rect.top;
-        const offsetX = e.clientX - rect.left;
-
-        // Create high-fidelity drag clone (ghost)
-        const ghost = row.cloneNode(true);
-        ghost.classList.add('drag-ghost');
-        ghost.style.position = 'fixed';
-        ghost.style.zIndex = '10000';
-        ghost.style.pointerEvents = 'none';
-        ghost.style.width = rect.width + 'px';
-        ghost.style.height = rect.height + 'px';
-        ghost.style.left = rect.left + 'px';
-        ghost.style.top = rect.top + 'px';
-        ghost.style.opacity = '0.85';
-        ghost.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.5)';
-        ghost.style.transform = 'scale(1.02)';
-        ghost.style.transition = 'transform 0.1s ease';
-        document.body.appendChild(ghost);
-
-        row.classList.add('dragging');
-        document.body.classList.add('is-sorting');
-
-        try {
-            handle.setPointerCapture(e.pointerId);
-        } catch (_) {}
-
-        const moveGhost = (clientX, clientY) => {
-            ghost.style.top = (clientY - offsetY) + 'px';
-            ghost.style.left = (clientX - offsetX) + 'px';
-        };
-
-        moveGhost(e.clientX, e.clientY);
-
-        const onMove = ev => {
-            moveGhost(ev.clientX, ev.clientY);
-
-            // Auto-scroll when dragging near viewport top/bottom
-            const scrollMargin = 72;
-            if (ev.clientY < scrollMargin) {
-                window.scrollBy(0, -8);
-            } else if (ev.clientY > window.innerHeight - scrollMargin) {
-                window.scrollBy(0, 8);
+            } catch (err) {
+                console.error("Error parsing saved checklist order:", err);
             }
 
-            if (opts.type === 'category') {
-                const siblings = [...container.children].filter(ch => ch.classList.contains('category-card') && ch !== row);
-                let after = null;
-                for (const s of siblings) {
-                    const r = s.getBoundingClientRect();
-                    if (ev.clientY < r.top + r.height / 2) {
-                        after = s;
-                        break;
-                    }
-                }
-                if (after == null) {
-                    container.appendChild(row);
-                } else {
-                    container.insertBefore(row, after);
-                }
-            } else if (opts.type === 'item') {
-                // Find list container closest to pointer coordinates to support cross-category drops
-                let targetList = container;
-                const lists = document.querySelectorAll('.checklist-list');
-                for (const list of lists) {
-                    // Skip list containers belonging to collapsed categories
-                    const card = list.closest('.category-card');
-                    if (card && card.classList.contains('collapsed')) {
-                        continue;
-                    }
-
-                    const rList = list.getBoundingClientRect();
-                    if (ev.clientY >= rList.top - 30 && ev.clientY <= rList.bottom + 30 &&
-                        ev.clientX >= rList.left - 30 && ev.clientX <= rList.right + 30) {
-                        targetList = list;
-                        break;
-                    }
-                }
-
-                const siblings = [...targetList.children].filter(ch => ch !== row);
-                let after = null;
-                for (const s of siblings) {
-                    const r = s.getBoundingClientRect();
-                    if (ev.clientY < r.top + r.height / 2) {
-                        after = s;
-                        break;
-                    }
-                }
-                if (after == null) {
-                    targetList.appendChild(row);
-                } else {
-                    targetList.insertBefore(row, after);
-                }
-            }
-        };
-
-        const onUp = () => {
-            document.removeEventListener('pointermove', onMove);
-            document.removeEventListener('pointerup', onUp);
-            ghost.remove();
-            row.classList.remove('dragging');
-            document.body.classList.remove('is-sorting');
-            saveCurrentOrder();
-            renderChecklist();
-        };
-
-        document.addEventListener('pointermove', onMove);
-        document.addEventListener('pointerup', onUp);
-    }
-
-    // Save custom category and items layout order to safeStorage
-    function saveCurrentOrder() {
-        const order = {
-            categories: [],
-            items: {}
-        };
-        
-        const cards = document.querySelectorAll('.category-card');
-        cards.forEach(card => {
-            const titleEl = card.querySelector('.category-title-input');
-            const categoryName = titleEl ? titleEl.value : card.querySelector('.category-title').innerText;
-            order.categories.push(categoryName);
-            
-            order.items[categoryName] = [];
-            const listContainer = card.querySelector('.checklist-list');
-            const children = listContainer.children;
-            for (let child of children) {
-                if (child.classList.contains('checklist-subheader')) {
-                    const subInput = child.querySelector('.subheader-input');
-                    const subText = subInput ? subInput.value : child.getAttribute('data-text');
-                    order.items[categoryName].push({ type: 'subheader', text: subText });
-                } else if (child.classList.contains('checklist-item')) {
-                    const itemInput = child.querySelector('.item-input');
-                    const itemText = itemInput ? itemInput.value : child.getAttribute('data-text');
-                    order.items[categoryName].push({ type: 'item', text: itemText });
-                }
-            }
-        });
-        
-        safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-    }
-
-    // Toggle collapse/expand status of a category card
-    function toggleCategory(category) {
-        const card = document.getElementById(`card-${category}`);
-        if (card.classList.contains('collapsed')) {
-            card.classList.remove('collapsed');
-            collapsedCategories.delete(category);
-        } else {
-            card.classList.add('collapsed');
-            collapsedCategories.add(category);
-        }
-        safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
-    }
-
-    // Toggle Edit Mode
-    function toggleEditMode() {
-        editMode = !editMode;
-        const btns = document.querySelectorAll('#editToggleBtn, #editToggleBtnBottom');
-        btns.forEach(btn => {
-            if (editMode) {
-                btn.innerText = '✓ 완료';
-                btn.style.backgroundColor = 'var(--primary)';
-                btn.style.color = '#FFFFFF';
-            } else {
-                btn.innerText = '✏️ 편집 모드';
-                btn.style.backgroundColor = 'transparent';
-                btn.style.color = 'var(--primary)';
-            }
-        });
-        const heroControls = document.getElementById('heroEditControls');
-        if (heroControls) {
-            heroControls.style.display = editMode ? 'flex' : 'none';
-        }
-        renderChecklist();
-    }
-
-    // Hero Banner Image Customization
-    function loadHeroImage() {
-        const savedImage = safeStorage.getItem('fujirock_hero_image');
-        const hero = document.getElementById('heroContainer');
-        const resetBtn = document.getElementById('heroResetBtn');
-        if (savedImage) {
-            hero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${savedImage})`;
-            hero.style.backgroundSize = 'cover';
-            hero.style.backgroundPosition = 'center';
-            if (resetBtn) resetBtn.style.display = 'inline-block';
-        } else {
-            hero.style.backgroundImage = '';
-            if (resetBtn) resetBtn.style.display = 'none';
-        }
-    }
-
-    window.triggerHeroImageUpload = function() {
-        document.getElementById('heroImageInput').click();
-    };
-
-    window.handleHeroImageUpload = function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64 = e.target.result;
-                safeStorage.setItem('fujirock_hero_image', base64);
-                loadHeroImage();
+            // Generate default order structure if not already saved
+            const order = {
+                categories: Object.keys(packingList),
+                items: {}
             };
-            reader.readAsDataURL(file);
-        }
-    };
 
-    window.resetHeroImage = function() {
-        safeStorage.removeItem('fujirock_hero_image');
-        loadHeroImage();
-    };
-
-    // Category renaming
-    function renameCategory(oldName, newName) {
-        newName = (newName || '').trim();
-        if (!newName || oldName === newName) return;
-
-        const order = getSavedOrder();
-        if (order.categories.includes(newName)) {
-            alert('이미 존재하는 카테고리 이름입니다.');
-            renderChecklist();
-            return;
-        }
-
-        const index = order.categories.indexOf(oldName);
-        if (index !== -1) {
-            order.categories[index] = newName;
-            order.items[newName] = order.items[oldName];
-            delete order.items[oldName];
-
-            if (collapsedCategories.has(oldName)) {
-                collapsedCategories.delete(oldName);
-                collapsedCategories.add(newName);
-                safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+            // Checkbox State Migration for fresh load fallback
+            const legacyCheckedRaw = safeStorage.getItem('fujirock_checked_items');
+            let checkedSet = new Set();
+            if (legacyCheckedRaw) {
+                try {
+                    checkedSet = new Set(JSON.parse(legacyCheckedRaw));
+                    safeStorage.removeItem('fujirock_checked_items');
+                } catch (e) { }
             }
 
-            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-            renderChecklist();
-        }
-    }
-
-    // Category deletion
-    function deleteCategory(category) {
-        if (!confirm(`"${category}" 카테고리를 정말 삭제하시겠습니까?`)) return;
-        const order = getSavedOrder();
-        const index = order.categories.indexOf(category);
-        if (index !== -1) {
-            order.categories.splice(index, 1);
-            delete order.items[category];
-
-            if (collapsedCategories.has(category)) {
-                collapsedCategories.delete(category);
-                safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+            for (const [category, categoryData] of Object.entries(packingList)) {
+                order.items[category] = [];
+                for (const [subheader, items] of Object.entries(categoryData)) {
+                    if (subheader) {
+                        order.items[category].push({ type: 'subheader', text: subheader });
+                    }
+                    items.forEach(item => {
+                        order.items[category].push({ type: 'item', text: item, checked: checkedSet.has(item) });
+                    });
+                }
             }
-
             safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-            renderChecklist();
+            return order;
         }
-    }
 
-    // Item/subheader renaming
-    function renameItem(category, index, newText) {
-        newText = (newText || '').trim();
-
-        const order = getSavedOrder();
-        if (order.items[category] && order.items[category][index]) {
-            const oldText = order.items[category][index].text;
-            if (oldText === newText) return;
-
-            order.items[category][index].text = newText;
-
-            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-            renderChecklist();
-        }
-    }
-
-    // Item/subheader deletion
-    function deleteItem(category, index) {
-        const order = getSavedOrder();
-        if (order.items[category] && order.items[category][index]) {
-            order.items[category].splice(index, 1);
-            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-            renderChecklist();
-        }
-    }
-
-    // Add item or subheader inside category
-    function addItemToCategory(category, type) {
-        const order = getSavedOrder();
-        if (order.items[category]) {
-            order.items[category].push({ type: type, text: '' });
-            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-            
-            // Set focus flag for this index
-            focusAfterRender = { category: category, index: order.items[category].length - 1 };
-            
-            renderChecklist();
-        }
-    }
-
-    // Add new Category card
-    function addNewCategory() {
-        const order = getSavedOrder();
-        const newCatName = `새 카테고리 ${order.categories.length + 1}`;
-        order.categories.push(newCatName);
-        order.items[newCatName] = [];
-        safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
-        
-        focusAfterRender = { category: newCatName, index: 'name' };
-        
-        renderChecklist();
-    }
-
-    // Initialize list and render in DOM
-    function renderChecklist() {
-        const container = document.getElementById('checklistCategories');
-        container.innerHTML = '';
-        
         const currentOrder = getSavedOrder();
 
-        for (const category of currentOrder.categories) {
-            const card = document.createElement('div');
-            card.className = 'category-card';
-            card.id = `card-${category}`;
-            if (collapsedCategories.has(category)) {
-                card.classList.add('collapsed');
+        // Load collapsed preference from safeStorage, default all collapsed on first run
+        let collapsedCategories;
+        try {
+            const hasCollapsedPref = safeStorage.getItem('fujirock_collapsed_categories');
+            if (hasCollapsedPref === null) {
+                collapsedCategories = new Set(Object.keys(packingList));
+                safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+            } else {
+                collapsedCategories = new Set(JSON.parse(hasCollapsedPref));
             }
+        } catch (e) {
+            collapsedCategories = new Set(Object.keys(packingList));
+        }
 
-            // Category Header (clickable for collapse/expand toggle)
-            const header = document.createElement('div');
-            header.className = 'category-header';
-            header.addEventListener('click', (e) => {
-                if (e.target.closest('.drag-handle') || e.target.closest('.btn-delete') || e.target.closest('input')) return; // ignore layout events
-                toggleCategory(category);
+        // Custom Pointer Events based Drag and Drop Engine (Supports desktop mouse & mobile touch natively)
+        function makeSortable(container, opts) {
+            container.addEventListener('pointerdown', e => {
+                if (e.button != null && e.button !== 0) return;
+                const handle = e.target.closest(opts.handleSelector);
+                if (!handle || !container.contains(handle)) return;
+                const row = handle.closest(opts.rowSelector);
+                if (!row) return;
+                e.preventDefault();
+                startDrag(container, row, handle, e, opts);
+            });
+        }
+
+        function startDrag(container, row, handle, e, opts) {
+            const rect = row.getBoundingClientRect();
+            const offsetY = e.clientY - rect.top;
+            const offsetX = e.clientX - rect.left;
+
+            // Create high-fidelity drag clone (ghost)
+            const ghost = row.cloneNode(true);
+            ghost.classList.add('drag-ghost');
+            ghost.style.position = 'fixed';
+            ghost.style.zIndex = '10000';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.width = rect.width + 'px';
+            ghost.style.height = rect.height + 'px';
+            ghost.style.left = rect.left + 'px';
+            ghost.style.top = rect.top + 'px';
+            ghost.style.opacity = '0.85';
+            ghost.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.5)';
+            ghost.style.transform = 'scale(1.02)';
+            ghost.style.transition = 'transform 0.1s ease';
+            document.body.appendChild(ghost);
+
+            row.classList.add('dragging');
+            document.body.classList.add('is-sorting');
+
+            try {
+                handle.setPointerCapture(e.pointerId);
+            } catch (_) { }
+
+            const moveGhost = (clientX, clientY) => {
+                ghost.style.top = (clientY - offsetY) + 'px';
+                ghost.style.left = (clientX - offsetX) + 'px';
+            };
+
+            moveGhost(e.clientX, e.clientY);
+
+            const onMove = ev => {
+                moveGhost(ev.clientX, ev.clientY);
+
+                // Auto-scroll when dragging near viewport top/bottom
+                const scrollMargin = 72;
+                if (ev.clientY < scrollMargin) {
+                    window.scrollBy(0, -8);
+                } else if (ev.clientY > window.innerHeight - scrollMargin) {
+                    window.scrollBy(0, 8);
+                }
+
+                if (opts.type === 'category') {
+                    const siblings = [...container.children].filter(ch => ch.classList.contains('category-card') && ch !== row);
+                    let after = null;
+                    for (const s of siblings) {
+                        const r = s.getBoundingClientRect();
+                        if (ev.clientY < r.top + r.height / 2) {
+                            after = s;
+                            break;
+                        }
+                    }
+                    if (after == null) {
+                        container.appendChild(row);
+                    } else {
+                        container.insertBefore(row, after);
+                    }
+                } else if (opts.type === 'item') {
+                    // Find list container closest to pointer coordinates to support cross-category drops
+                    let targetList = container;
+                    const lists = document.querySelectorAll('.checklist-list');
+                    for (const list of lists) {
+                        // Skip list containers belonging to collapsed categories
+                        const card = list.closest('.category-card');
+                        if (card && card.classList.contains('collapsed')) {
+                            continue;
+                        }
+
+                        const rList = list.getBoundingClientRect();
+                        if (ev.clientY >= rList.top - 30 && ev.clientY <= rList.bottom + 30 &&
+                            ev.clientX >= rList.left - 30 && ev.clientX <= rList.right + 30) {
+                            targetList = list;
+                            break;
+                        }
+                    }
+
+                    const siblings = [...targetList.children].filter(ch => ch !== row);
+                    let after = null;
+                    for (const s of siblings) {
+                        const r = s.getBoundingClientRect();
+                        if (ev.clientY < r.top + r.height / 2) {
+                            after = s;
+                            break;
+                        }
+                    }
+                    if (after == null) {
+                        targetList.appendChild(row);
+                    } else {
+                        targetList.insertBefore(row, after);
+                    }
+                }
+            };
+
+            const onUp = () => {
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('pointerup', onUp);
+                ghost.remove();
+                row.classList.remove('dragging');
+                document.body.classList.remove('is-sorting');
+                saveCurrentOrder();
+                renderChecklist();
+            };
+
+            document.addEventListener('pointermove', onMove);
+            document.addEventListener('pointerup', onUp);
+        }
+
+        // Save custom category and items layout order to safeStorage
+        function saveCurrentOrder() {
+            const order = {
+                categories: [],
+                items: {}
+            };
+
+            const cards = document.querySelectorAll('.category-card');
+            cards.forEach(card => {
+                const titleEl = card.querySelector('.category-title-input');
+                const categoryName = titleEl ? titleEl.value : card.querySelector('.category-title').innerText;
+                order.categories.push(categoryName);
+
+                order.items[categoryName] = [];
+                const listContainer = card.querySelector('.checklist-list');
+                const children = listContainer.children;
+                for (let child of children) {
+                    if (child.classList.contains('checklist-subheader')) {
+                        const subInput = child.querySelector('.subheader-input');
+                        const subText = subInput ? subInput.value : child.getAttribute('data-text');
+                        order.items[categoryName].push({ type: 'subheader', text: subText });
+                    } else if (child.classList.contains('checklist-item')) {
+                        const itemInput = child.querySelector('.item-input');
+                        const itemText = itemInput ? itemInput.value : child.getAttribute('data-text');
+                        order.items[categoryName].push({ type: 'item', text: itemText });
+                    }
+                }
             });
 
-            const titleContainer = document.createElement('div');
-            titleContainer.style.display = 'flex';
-            titleContainer.style.alignItems = 'center';
-            titleContainer.style.flexGrow = '1';
+            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+        }
 
-            // Drag handle for Category Card (SVG dots)
-            const dragHandle = document.createElement('div');
-            dragHandle.className = 'drag-handle category-drag-handle';
-            dragHandle.innerHTML = `
+        // Toggle collapse/expand status of a category card
+        function toggleCategory(category) {
+            const card = document.getElementById(`card-${category}`);
+            if (card.classList.contains('collapsed')) {
+                card.classList.remove('collapsed');
+                collapsedCategories.delete(category);
+            } else {
+                card.classList.add('collapsed');
+                collapsedCategories.add(category);
+            }
+            safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+        }
+
+        // Toggle Edit Mode
+        function toggleEditMode() {
+            editMode = !editMode;
+            const btns = document.querySelectorAll('#editToggleBtn, #editToggleBtnBottom');
+            btns.forEach(btn => {
+                if (editMode) {
+                    btn.innerText = '✓ 완료';
+                    btn.style.backgroundColor = 'var(--primary)';
+                    btn.style.color = '#FFFFFF';
+                } else {
+                    btn.innerText = '✏️ 편집 모드';
+                    btn.style.backgroundColor = 'transparent';
+                    btn.style.color = 'var(--primary)';
+                }
+            });
+            const heroControls = document.getElementById('heroEditControls');
+            if (heroControls) {
+                heroControls.style.display = editMode ? 'flex' : 'none';
+            }
+            renderChecklist();
+        }
+
+        // Hero Banner Image Customization
+        function loadHeroImage() {
+            const savedImage = safeStorage.getItem('fujirock_hero_image');
+            const hero = document.getElementById('heroContainer');
+            const resetBtn = document.getElementById('heroResetBtn');
+            if (savedImage) {
+                hero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${savedImage})`;
+                hero.style.backgroundSize = 'cover';
+                hero.style.backgroundPosition = 'center';
+                if (resetBtn) resetBtn.style.display = 'inline-block';
+            } else {
+                hero.style.backgroundImage = '';
+                if (resetBtn) resetBtn.style.display = 'none';
+            }
+        }
+
+        window.triggerHeroImageUpload = function () {
+            document.getElementById('heroImageInput').click();
+        };
+
+        window.handleHeroImageUpload = function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const base64 = e.target.result;
+                    safeStorage.setItem('fujirock_hero_image', base64);
+                    loadHeroImage();
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.resetHeroImage = function () {
+            safeStorage.removeItem('fujirock_hero_image');
+            loadHeroImage();
+        };
+
+        // Category renaming
+        function renameCategory(oldName, newName) {
+            newName = (newName || '').trim();
+            if (!newName || oldName === newName) return;
+
+            const order = getSavedOrder();
+            if (order.categories.includes(newName)) {
+                alert('이미 존재하는 카테고리 이름입니다.');
+                renderChecklist();
+                return;
+            }
+
+            const index = order.categories.indexOf(oldName);
+            if (index !== -1) {
+                order.categories[index] = newName;
+                order.items[newName] = order.items[oldName];
+                delete order.items[oldName];
+
+                if (collapsedCategories.has(oldName)) {
+                    collapsedCategories.delete(oldName);
+                    collapsedCategories.add(newName);
+                    safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+                }
+
+                safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+                renderChecklist();
+            }
+        }
+
+        // Category deletion
+        function deleteCategory(category) {
+            if (!confirm(`"${category}" 카테고리를 정말 삭제하시겠습니까?`)) return;
+            const order = getSavedOrder();
+            const index = order.categories.indexOf(category);
+            if (index !== -1) {
+                order.categories.splice(index, 1);
+                delete order.items[category];
+
+                if (collapsedCategories.has(category)) {
+                    collapsedCategories.delete(category);
+                    safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+                }
+
+                safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+                renderChecklist();
+            }
+        }
+
+        // Item/subheader renaming
+        function renameItem(category, index, newText) {
+            newText = (newText || '').trim();
+
+            const order = getSavedOrder();
+            if (order.items[category] && order.items[category][index]) {
+                const oldText = order.items[category][index].text;
+                if (oldText === newText) return;
+
+                order.items[category][index].text = newText;
+
+                safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+                renderChecklist();
+            }
+        }
+
+        // Item/subheader deletion
+        function deleteItem(category, index) {
+            const order = getSavedOrder();
+            if (order.items[category] && order.items[category][index]) {
+                order.items[category].splice(index, 1);
+                safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+                renderChecklist();
+            }
+        }
+
+        // Add item or subheader inside category
+        function addItemToCategory(category, type) {
+            const order = getSavedOrder();
+            if (order.items[category]) {
+                order.items[category].push({ type: type, text: '' });
+                safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+
+                // Set focus flag for this index
+                focusAfterRender = { category: category, index: order.items[category].length - 1 };
+
+                renderChecklist();
+            }
+        }
+
+        // Add new Category card
+        function addNewCategory() {
+            const order = getSavedOrder();
+            const newCatName = `새 카테고리 ${order.categories.length + 1}`;
+            order.categories.push(newCatName);
+            order.items[newCatName] = [];
+            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+
+            focusAfterRender = { category: newCatName, index: 'name' };
+
+            renderChecklist();
+        }
+
+        // Initialize list and render in DOM
+        function renderChecklist() {
+            const container = document.getElementById('checklistCategories');
+            container.innerHTML = '';
+
+            const currentOrder = getSavedOrder();
+
+            for (const category of currentOrder.categories) {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.id = `card-${category}`;
+                if (collapsedCategories.has(category)) {
+                    card.classList.add('collapsed');
+                }
+
+                // Category Header (clickable for collapse/expand toggle)
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.addEventListener('click', (e) => {
+                    if (e.target.closest('.drag-handle') || e.target.closest('.btn-delete') || e.target.closest('input')) return; // ignore layout events
+                    toggleCategory(category);
+                });
+
+                const titleContainer = document.createElement('div');
+                titleContainer.style.display = 'flex';
+                titleContainer.style.alignItems = 'center';
+                titleContainer.style.flexGrow = '1';
+
+                // Drag handle for Category Card (SVG dots)
+                const dragHandle = document.createElement('div');
+                dragHandle.className = 'drag-handle category-drag-handle';
+                dragHandle.innerHTML = `
                 <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
                     <circle cx="2.5" cy="3" r="1.5" stroke="none" />
                     <circle cx="2.5" cy="9" r="1.5" stroke="none" />
@@ -1088,660 +1105,661 @@
                     <circle cx="9.5" cy="15" r="1.5" stroke="none" />
                 </svg>
             `;
-            titleContainer.appendChild(dragHandle);
+                titleContainer.appendChild(dragHandle);
 
-            if (editMode) {
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.className = 'edit-input category-title-input';
-                input.value = category;
-                input.style.fontWeight = 'bold';
-                input.style.fontSize = '1.25rem';
-                input.style.color = 'var(--primary)';
-                input.style.border = 'none';
-                input.style.background = 'transparent';
-                input.style.width = '70%';
-                input.addEventListener('change', () => {
-                    renameCategory(category, input.value);
-                });
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') input.blur();
-                });
-                titleContainer.appendChild(input);
-            } else {
-                const title = document.createElement('span');
-                title.className = 'category-title';
-                title.innerText = category;
-                titleContainer.appendChild(title);
-            }
-            header.appendChild(titleContainer);
-
-            // Badge and arrow container
-            const badgeContainer = document.createElement('div');
-            badgeContainer.style.display = 'flex';
-            badgeContainer.style.alignItems = 'center';
-            badgeContainer.style.gap = '10px';
-
-            if (editMode) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'btn-delete';
-                deleteBtn.innerHTML = '🗑';
-                deleteBtn.title = '카테고리 삭제';
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    deleteCategory(category);
-                });
-                badgeContainer.appendChild(deleteBtn);
-            } else {
-                const badge = document.createElement('span');
-                badge.className = 'category-badge';
-                badge.id = `badge-${category}`;
-                badgeContainer.appendChild(badge);
-            }
-
-            const arrow = document.createElement('span');
-            arrow.className = 'toggle-arrow';
-            arrow.innerText = '▲';
-            badgeContainer.appendChild(arrow);
-
-            header.appendChild(badgeContainer);
-            card.appendChild(header);
-
-            // Category Content
-            const content = document.createElement('div');
-            content.className = 'category-content';
-            content.id = `content-${category}`;
-
-            const list = document.createElement('div');
-            list.className = 'checklist-list';
-            list.id = `list-${category}`;
-
-            const categoryItems = currentOrder.items[category] || [];
-            
-            // Track if current item should be nested under a subheading
-            let activeSubheader = false;
-
-            categoryItems.forEach((node, itemIndex) => {
-                if (node.type === 'subheader') {
-                    activeSubheader = node.text;
-                    const subHeaderDiv = document.createElement('div');
-                    subHeaderDiv.className = 'checklist-subheader';
-                    subHeaderDiv.setAttribute('data-text', node.text);
-                    subHeaderDiv.style.display = 'flex';
-                    subHeaderDiv.style.alignItems = 'center';
-                    subHeaderDiv.style.fontWeight = 'bold';
-                    subHeaderDiv.style.color = 'var(--accent)';
-                    subHeaderDiv.style.marginTop = '12px';
-                    subHeaderDiv.style.marginBottom = '6px';
-                    subHeaderDiv.style.fontSize = '1.05rem';
-                    subHeaderDiv.style.width = '100%';
-
-                    // Subheader drag handle
-                    const subHandle = document.createElement('div');
-                    subHandle.className = 'drag-handle item-drag-handle';
-                    subHandle.innerHTML = `
-                        <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
-                            <circle cx="2.5" cy="3" r="1.5" stroke="none" />
-                            <circle cx="2.5" cy="9" r="1.5" stroke="none" />
-                            <circle cx="2.5" cy="15" r="1.5" stroke="none" />
-                            <circle cx="9.5" cy="3" r="1.5" stroke="none" />
-                            <circle cx="9.5" cy="9" r="1.5" stroke="none" />
-                            <circle cx="9.5" cy="15" r="1.5" stroke="none" />
-                        </svg>
-                    `;
-                    subHeaderDiv.appendChild(subHandle);
-
-                    if (editMode) {
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.className = 'edit-input subheader-input';
-                        input.value = node.text;
-                        input.placeholder = '소제목 입력';
-                        input.style.fontWeight = 'bold';
-                        input.style.color = 'var(--accent)';
-                        input.style.border = 'none';
-                        input.style.background = 'transparent';
-                        input.style.marginLeft = '5px';
-                        input.style.flexGrow = '1';
-                        input.addEventListener('change', () => {
-                            renameItem(category, itemIndex, input.value);
-                        });
-                        input.addEventListener('keydown', (e) => {
-                            if (e.key === 'Enter') input.blur();
-                        });
-                        subHeaderDiv.appendChild(input);
-
-                        // Delete button
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'btn-delete';
-                        deleteBtn.innerHTML = '🗑';
-                        deleteBtn.addEventListener('click', () => {
-                            deleteItem(category, itemIndex);
-                        });
-                        subHeaderDiv.appendChild(deleteBtn);
-                    } else {
-                        const subTextSpan = document.createElement('span');
-                        subTextSpan.innerText = node.text ? `— ${node.text}` : '— (소제목 없음)';
-                        if (!node.text) {
-                            subTextSpan.style.color = 'var(--text-sub)';
-                            subTextSpan.style.fontStyle = 'italic';
-                        }
-                        subHeaderDiv.appendChild(subTextSpan);
-                    }
-
-                    list.appendChild(subHeaderDiv);
-                } else if (node.type === 'item') {
-                    const label = document.createElement('div');
-                    label.className = 'checklist-item';
-                    label.setAttribute('data-text', node.text);
-                    if (activeSubheader) {
-                        label.style.paddingLeft = '15px'; // Indent grouped items
-                    }
-
-                    // Item drag handle
-                    const itemHandle = document.createElement('div');
-                    itemHandle.className = 'drag-handle item-drag-handle';
-                    itemHandle.innerHTML = `
-                        <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
-                            <circle cx="2.5" cy="3" r="1.5" stroke="none" />
-                            <circle cx="2.5" cy="9" r="1.5" stroke="none" />
-                            <circle cx="2.5" cy="15" r="1.5" stroke="none" />
-                            <circle cx="9.5" cy="3" r="1.5" stroke="none" />
-                            <circle cx="9.5" cy="9" r="1.5" stroke="none" />
-                            <circle cx="9.5" cy="15" r="1.5" stroke="none" />
-                        </svg>
-                    `;
-                    label.appendChild(itemHandle);
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.checked = !!node.checked;
-                    checkbox.addEventListener('change', () => toggleItem(category, itemIndex, checkbox.checked));
-
-                    const checkmark = document.createElement('span');
-                    checkmark.className = 'checkmark';
-                    checkmark.style.cursor = 'pointer';
-                    checkmark.addEventListener('click', () => {
-                        checkbox.checked = !checkbox.checked;
-                        toggleItem(category, itemIndex, checkbox.checked);
+                if (editMode) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'edit-input category-title-input';
+                    input.value = category;
+                    input.style.fontWeight = 'bold';
+                    input.style.fontSize = '1.25rem';
+                    input.style.color = 'var(--primary)';
+                    input.style.border = 'none';
+                    input.style.background = 'transparent';
+                    input.style.width = '70%';
+                    input.addEventListener('change', () => {
+                        renameCategory(category, input.value);
                     });
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') input.blur();
+                    });
+                    titleContainer.appendChild(input);
+                } else {
+                    const title = document.createElement('span');
+                    title.className = 'category-title';
+                    title.innerText = category;
+                    titleContainer.appendChild(title);
+                }
+                header.appendChild(titleContainer);
 
-                    if (editMode) {
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.className = 'edit-input item-input';
-                        input.value = node.text;
-                        input.placeholder = '준비물 입력';
-                        input.style.border = 'none';
-                        input.style.background = 'transparent';
-                        input.style.flexGrow = '1';
-                        input.addEventListener('change', () => {
-                            renameItem(category, itemIndex, input.value);
-                        });
-                        input.addEventListener('keydown', (e) => {
-                            if (e.key === 'Enter') input.blur();
-                        });
-                        label.appendChild(input);
+                // Badge and arrow container
+                const badgeContainer = document.createElement('div');
+                badgeContainer.style.display = 'flex';
+                badgeContainer.style.alignItems = 'center';
+                badgeContainer.style.gap = '10px';
 
-                        // Delete button
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'btn-delete';
-                        deleteBtn.innerHTML = '🗑';
-                        deleteBtn.addEventListener('click', () => {
-                            deleteItem(category, itemIndex);
-                        });
-                        label.appendChild(deleteBtn);
-                    } else {
-                        const text = document.createElement('span');
-                        text.className = 'item-text';
-                        text.innerText = node.text || '(이름 없음)';
-                        if (!node.text) {
-                            text.style.color = 'var(--text-sub)';
-                            text.style.fontStyle = 'italic';
+                if (editMode) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-delete';
+                    deleteBtn.innerHTML = '🗑';
+                    deleteBtn.title = '카테고리 삭제';
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteCategory(category);
+                    });
+                    badgeContainer.appendChild(deleteBtn);
+                } else {
+                    const badge = document.createElement('span');
+                    badge.className = 'category-badge';
+                    badge.id = `badge-${category}`;
+                    badgeContainer.appendChild(badge);
+                }
+
+                const arrow = document.createElement('span');
+                arrow.className = 'toggle-arrow';
+                arrow.innerText = '▲';
+                badgeContainer.appendChild(arrow);
+
+                header.appendChild(badgeContainer);
+                card.appendChild(header);
+
+                // Category Content
+                const content = document.createElement('div');
+                content.className = 'category-content';
+                content.id = `content-${category}`;
+
+                const list = document.createElement('div');
+                list.className = 'checklist-list';
+                list.id = `list-${category}`;
+
+                const categoryItems = currentOrder.items[category] || [];
+
+                // Track if current item should be nested under a subheading
+                let activeSubheader = false;
+
+                categoryItems.forEach((node, itemIndex) => {
+                    if (node.type === 'subheader') {
+                        activeSubheader = node.text;
+                        const subHeaderDiv = document.createElement('div');
+                        subHeaderDiv.className = 'checklist-subheader';
+                        subHeaderDiv.setAttribute('data-text', node.text);
+                        subHeaderDiv.style.display = 'flex';
+                        subHeaderDiv.style.alignItems = 'center';
+                        subHeaderDiv.style.fontWeight = 'bold';
+                        subHeaderDiv.style.color = 'var(--accent)';
+                        subHeaderDiv.style.marginTop = '12px';
+                        subHeaderDiv.style.marginBottom = '6px';
+                        subHeaderDiv.style.fontSize = '1.05rem';
+                        subHeaderDiv.style.width = '100%';
+
+                        // Subheader drag handle
+                        const subHandle = document.createElement('div');
+                        subHandle.className = 'drag-handle item-drag-handle';
+                        subHandle.innerHTML = `
+                        <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
+                            <circle cx="2.5" cy="3" r="1.5" stroke="none" />
+                            <circle cx="2.5" cy="9" r="1.5" stroke="none" />
+                            <circle cx="2.5" cy="15" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="3" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="9" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="15" r="1.5" stroke="none" />
+                        </svg>
+                    `;
+                        subHeaderDiv.appendChild(subHandle);
+
+                        if (editMode) {
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.className = 'edit-input subheader-input';
+                            input.value = node.text;
+                            input.placeholder = '소제목 입력';
+                            input.style.fontWeight = 'bold';
+                            input.style.color = 'var(--accent)';
+                            input.style.border = 'none';
+                            input.style.background = 'transparent';
+                            input.style.marginLeft = '5px';
+                            input.style.flexGrow = '1';
+                            input.addEventListener('change', () => {
+                                renameItem(category, itemIndex, input.value);
+                            });
+                            input.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') input.blur();
+                            });
+                            subHeaderDiv.appendChild(input);
+
+                            // Delete button
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.className = 'btn-delete';
+                            deleteBtn.innerHTML = '🗑';
+                            deleteBtn.addEventListener('click', () => {
+                                deleteItem(category, itemIndex);
+                            });
+                            subHeaderDiv.appendChild(deleteBtn);
+                        } else {
+                            const subTextSpan = document.createElement('span');
+                            subTextSpan.innerText = node.text ? `— ${node.text}` : '— (소제목 없음)';
+                            if (!node.text) {
+                                subTextSpan.style.color = 'var(--text-sub)';
+                                subTextSpan.style.fontStyle = 'italic';
+                            }
+                            subHeaderDiv.appendChild(subTextSpan);
                         }
-                        text.style.cursor = 'pointer';
-                        text.addEventListener('click', () => {
+
+                        list.appendChild(subHeaderDiv);
+                    } else if (node.type === 'item') {
+                        const label = document.createElement('div');
+                        label.className = 'checklist-item';
+                        label.setAttribute('data-text', node.text);
+                        if (activeSubheader) {
+                            label.style.paddingLeft = '15px'; // Indent grouped items
+                        }
+
+                        // Item drag handle
+                        const itemHandle = document.createElement('div');
+                        itemHandle.className = 'drag-handle item-drag-handle';
+                        itemHandle.innerHTML = `
+                        <svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor">
+                            <circle cx="2.5" cy="3" r="1.5" stroke="none" />
+                            <circle cx="2.5" cy="9" r="1.5" stroke="none" />
+                            <circle cx="2.5" cy="15" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="3" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="9" r="1.5" stroke="none" />
+                            <circle cx="9.5" cy="15" r="1.5" stroke="none" />
+                        </svg>
+                    `;
+                        label.appendChild(itemHandle);
+
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = !!node.checked;
+                        checkbox.addEventListener('change', () => toggleItem(category, itemIndex, checkbox.checked));
+
+                        const checkmark = document.createElement('span');
+                        checkmark.className = 'checkmark';
+                        checkmark.style.cursor = 'pointer';
+                        checkmark.addEventListener('click', () => {
                             checkbox.checked = !checkbox.checked;
                             toggleItem(category, itemIndex, checkbox.checked);
                         });
 
-                        label.appendChild(checkbox);
-                        label.appendChild(checkmark);
-                        label.appendChild(text);
+                        if (editMode) {
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.className = 'edit-input item-input';
+                            input.value = node.text;
+                            input.placeholder = '준비물 입력';
+                            input.style.border = 'none';
+                            input.style.background = 'transparent';
+                            input.style.flexGrow = '1';
+                            input.addEventListener('change', () => {
+                                renameItem(category, itemIndex, input.value);
+                            });
+                            input.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') input.blur();
+                            });
+                            label.appendChild(input);
+
+                            // Delete button
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.className = 'btn-delete';
+                            deleteBtn.innerHTML = '🗑';
+                            deleteBtn.addEventListener('click', () => {
+                                deleteItem(category, itemIndex);
+                            });
+                            label.appendChild(deleteBtn);
+                        } else {
+                            const text = document.createElement('span');
+                            text.className = 'item-text';
+                            text.innerText = node.text || '(이름 없음)';
+                            if (!node.text) {
+                                text.style.color = 'var(--text-sub)';
+                                text.style.fontStyle = 'italic';
+                            }
+                            text.style.cursor = 'pointer';
+                            text.addEventListener('click', () => {
+                                checkbox.checked = !checkbox.checked;
+                                toggleItem(category, itemIndex, checkbox.checked);
+                            });
+
+                            label.appendChild(checkbox);
+                            label.appendChild(checkmark);
+                            label.appendChild(text);
+                        }
+
+                        list.appendChild(label);
                     }
+                });
 
-                    list.appendChild(label);
+                content.appendChild(list);
+
+                if (editMode) {
+                    const controlsDiv = document.createElement('div');
+                    controlsDiv.className = 'edit-controls-container';
+
+                    const addSubheaderBtn = document.createElement('button');
+                    addSubheaderBtn.className = 'btn-add-item';
+                    addSubheaderBtn.innerText = '＋ 소제목 추가';
+                    addSubheaderBtn.addEventListener('click', () => {
+                        addItemToCategory(category, 'subheader');
+                    });
+
+                    const addItemBtn = document.createElement('button');
+                    addItemBtn.className = 'btn-add-item';
+                    addItemBtn.innerText = '＋ 준비물 추가';
+                    addItemBtn.addEventListener('click', () => {
+                        addItemToCategory(category, 'item');
+                    });
+
+                    controlsDiv.appendChild(addSubheaderBtn);
+                    controlsDiv.appendChild(addItemBtn);
+                    content.appendChild(controlsDiv);
                 }
-            });
 
-            content.appendChild(list);
-
-            if (editMode) {
-                const controlsDiv = document.createElement('div');
-                controlsDiv.className = 'edit-controls-container';
-
-                const addSubheaderBtn = document.createElement('button');
-                addSubheaderBtn.className = 'btn-add-item';
-                addSubheaderBtn.innerText = '＋ 소제목 추가';
-                addSubheaderBtn.addEventListener('click', () => {
-                    addItemToCategory(category, 'subheader');
-                });
-
-                const addItemBtn = document.createElement('button');
-                addItemBtn.className = 'btn-add-item';
-                addItemBtn.innerText = '＋ 준비물 추가';
-                addItemBtn.addEventListener('click', () => {
-                    addItemToCategory(category, 'item');
-                });
-
-                controlsDiv.appendChild(addSubheaderBtn);
-                controlsDiv.appendChild(addItemBtn);
-                content.appendChild(controlsDiv);
+                card.appendChild(content);
+                container.appendChild(card);
             }
 
-            card.appendChild(content);
-            container.appendChild(card);
-        }
+            if (editMode) {
+                const addCatContainer = document.createElement('div');
+                addCatContainer.style.display = 'flex';
+                addCatContainer.style.justifyContent = 'center';
+                addCatContainer.style.marginTop = '20px';
 
-        if (editMode) {
-            const addCatContainer = document.createElement('div');
-            addCatContainer.style.display = 'flex';
-            addCatContainer.style.justifyContent = 'center';
-            addCatContainer.style.marginTop = '20px';
+                const addCatBtn = document.createElement('button');
+                addCatBtn.className = 'btn-reset';
+                addCatBtn.style.borderColor = 'var(--primary)';
+                addCatBtn.style.color = 'var(--primary)';
+                addCatBtn.innerText = '＋ 새 카테고리 추가';
+                addCatBtn.addEventListener('click', addNewCategory);
 
-            const addCatBtn = document.createElement('button');
-            addCatBtn.className = 'btn-reset';
-            addCatBtn.style.borderColor = 'var(--primary)';
-            addCatBtn.style.color = 'var(--primary)';
-            addCatBtn.innerText = '＋ 새 카테고리 추가';
-            addCatBtn.addEventListener('click', addNewCategory);
-
-            addCatContainer.appendChild(addCatBtn);
-            container.appendChild(addCatContainer);
-        }
+                addCatContainer.appendChild(addCatBtn);
+                container.appendChild(addCatContainer);
+            }
 
 
 
-        // Handle autofocus of newly added elements
-        if (typeof focusAfterRender !== 'undefined' && focusAfterRender !== null) {
-            const { category, index } = focusAfterRender;
-            focusAfterRender = null;
+            // Handle autofocus of newly added elements
+            if (typeof focusAfterRender !== 'undefined' && focusAfterRender !== null) {
+                const { category, index } = focusAfterRender;
+                focusAfterRender = null;
 
-            const card = document.getElementById(`card-${category}`);
-            if (card) {
-                // Ensure card is expanded to make inputs visible/focusable
-                card.classList.remove('collapsed');
-                collapsedCategories.delete(category);
-                safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+                const card = document.getElementById(`card-${category}`);
+                if (card) {
+                    // Ensure card is expanded to make inputs visible/focusable
+                    card.classList.remove('collapsed');
+                    collapsedCategories.delete(category);
+                    safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
 
-                if (index === 'name') {
-                    const input = card.querySelector('.category-title-input');
-                    if (input) {
-                        input.focus();
-                        input.select();
-                    }
-                } else {
-                    const list = card.querySelector('.checklist-list');
-                    if (list) {
-                        const children = list.children;
-                        const targetChild = children[index];
-                        if (targetChild) {
-                            const input = targetChild.querySelector('input[type="text"]');
-                            if (input) {
-                                input.focus();
+                    if (index === 'name') {
+                        const input = card.querySelector('.category-title-input');
+                        if (input) {
+                            input.focus();
+                            input.select();
+                        }
+                    } else {
+                        const list = card.querySelector('.checklist-list');
+                        if (list) {
+                            const children = list.children;
+                            const targetChild = children[index];
+                            if (targetChild) {
+                                const input = targetChild.querySelector('input[type="text"]');
+                                if (input) {
+                                    input.focus();
+                                }
                             }
                         }
                     }
                 }
             }
+
+            updateProgress();
         }
 
-        updateProgress();
-    }
-
-    // Toggle check status and sync to safeStorage
-    function toggleItem(category, index, isChecked) {
-        const order = getSavedOrder();
-        if (order.items[category] && order.items[category][index]) {
-            order.items[category][index].checked = isChecked;
-            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+        // Toggle check status and sync to safeStorage
+        function toggleItem(category, index, isChecked) {
+            const order = getSavedOrder();
+            if (order.items[category] && order.items[category][index]) {
+                order.items[category][index].checked = isChecked;
+                safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            }
+            updateProgress();
         }
-        updateProgress();
-    }
 
-    // Calculate total count and update progress UI based on current order data
-    function updateProgress() {
-        let grandTotal = 0;
-        let grandChecked = 0;
-        
-        const currentOrder = getSavedOrder();
-        
-        for (const category of currentOrder.categories) {
-            let catTotal = 0;
-            let catChecked = 0;
-            
-            const categoryItems = currentOrder.items[category] || [];
-            categoryItems.forEach(node => {
-                if (node.type === 'item') {
-                    catTotal++;
-                    if (node.checked) {
-                        catChecked++;
+        // Calculate total count and update progress UI based on current order data
+        function updateProgress() {
+            let grandTotal = 0;
+            let grandChecked = 0;
+
+            const currentOrder = getSavedOrder();
+
+            for (const category of currentOrder.categories) {
+                let catTotal = 0;
+                let catChecked = 0;
+
+                const categoryItems = currentOrder.items[category] || [];
+                categoryItems.forEach(node => {
+                    if (node.type === 'item') {
+                        catTotal++;
+                        if (node.checked) {
+                            catChecked++;
+                        }
+                    }
+                });
+
+                grandTotal += catTotal;
+                grandChecked += catChecked;
+
+                const badge = document.getElementById(`badge-${category}`);
+                if (badge) {
+                    badge.innerText = `${catChecked}/${catTotal}`;
+                    if (catChecked === catTotal && catTotal > 0) {
+                        badge.classList.add('complete');
+                    } else {
+                        badge.classList.remove('complete');
                     }
                 }
-            });
-            
-            grandTotal += catTotal;
-            grandChecked += catChecked;
-            
-            const badge = document.getElementById(`badge-${category}`);
-            if (badge) {
-                badge.innerText = `${catChecked}/${catTotal}`;
-                if (catChecked === catTotal && catTotal > 0) {
-                    badge.classList.add('complete');
-                } else {
-                    badge.classList.remove('complete');
-                }
+            }
+
+            const fillPercent = grandTotal > 0 ? (grandChecked / grandTotal) * 100 : 0;
+
+            const fillBar = document.getElementById('progressFill');
+            if (fillBar) fillBar.style.width = `${fillPercent}%`;
+
+            const pText = document.getElementById('progressText');
+            if (pText) pText.innerText = `진행률: ${Math.round(fillPercent)}%`;
+
+            const cText = document.getElementById('checkedCountText');
+            if (cText) cText.innerText = `선택된 항목: ${grandChecked} / ${grandTotal}`;
+
+            // Circular progress ring updates
+            const ringFill = document.getElementById('progressRingFill');
+            const ringText = document.getElementById('progressRingText');
+            if (ringFill && ringText) {
+                const circumference = 163.36;
+                const offset = circumference * (1 - fillPercent / 100);
+                ringFill.style.strokeDashoffset = offset;
+                ringText.innerText = `${Math.round(fillPercent)}%`;
             }
         }
 
-        const fillPercent = grandTotal > 0 ? (grandChecked / grandTotal) * 100 : 0;
-        
-        const fillBar = document.getElementById('progressFill');
-        if (fillBar) fillBar.style.width = `${fillPercent}%`;
-        
-        const pText = document.getElementById('progressText');
-        if (pText) pText.innerText = `진행률: ${Math.round(fillPercent)}%`;
-        
-        const cText = document.getElementById('checkedCountText');
-        if (cText) cText.innerText = `선택된 항목: ${grandChecked} / ${grandTotal}`;
-
-        // Circular progress ring updates
-        const ringFill = document.getElementById('progressRingFill');
-        const ringText = document.getElementById('progressRingText');
-        if (ringFill && ringText) {
-            const circumference = 163.36;
-            const offset = circumference * (1 - fillPercent / 100);
-            ringFill.style.strokeDashoffset = offset;
-            ringText.innerText = `${Math.round(fillPercent)}%`;
+        // Clear state
+        function resetAll() {
+            if (confirm("모든 체크 상태와 항목 순서를 초기화하시겠습니까?")) {
+                safeStorage.removeItem('fujirock_checked_items');
+                safeStorage.removeItem('fujirock_checklist_order');
+                safeStorage.removeItem('fujirock_collapsed_categories');
+                safeStorage.removeItem('fujirock_hero_image');
+                collapsedCategories = new Set(Object.keys(packingList));
+                safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+                loadHeroImage();
+                renderChecklist();
+            }
         }
-    }
 
-    // Clear state
-    function resetAll() {
-        if (confirm("모든 체크 상태와 항목 순서를 초기화하시겠습니까?")) {
-            safeStorage.removeItem('fujirock_checked_items');
-            safeStorage.removeItem('fujirock_checklist_order');
-            safeStorage.removeItem('fujirock_collapsed_categories');
-            safeStorage.removeItem('fujirock_hero_image');
-            collapsedCategories = new Set(Object.keys(packingList));
-            safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+        // Draw checklist as a downloadable high-quality mobile JPG image using Canvas API
+        function saveAsImage() {
+            const currentOrder = getSavedOrder();
+
+            // 1) 체크된 항목만 카테고리별로 수집
+            const filteredData = [];
+            let checkedTotal = 0;
+            let allTotal = 0;
+
+            for (const category of currentOrder.categories) {
+                const categoryItems = currentOrder.items[category] || [];
+                const filtered = [];
+                let lastSubheader = null;
+                let subheaderHasItems = false;
+
+                categoryItems.forEach(node => {
+                    if (node.type === 'subheader') {
+                        lastSubheader = node;
+                        subheaderHasItems = false;
+                    } else if (node.type === 'item') {
+                        allTotal++;
+                        if (node.checked) {
+                            checkedTotal++;
+                            // Add subheader if not already added for this group
+                            if (lastSubheader && !subheaderHasItems) {
+                                filtered.push(lastSubheader);
+                                subheaderHasItems = true;
+                            }
+                            filtered.push(node);
+                        }
+                    }
+                });
+
+                if (filtered.length > 0) {
+                    filteredData.push({ category, items: filtered });
+                }
+            }
+
+            if (checkedTotal === 0) {
+                alert('선택된 항목이 없습니다. 체크박스를 선택한 후 다시 시도해주세요.');
+                return;
+            }
+
+            // 2) Compute canvas height dynamically
+            let numLines = 0;
+            let numSubheaders = 0;
+            filteredData.forEach(cat => {
+                cat.items.forEach(node => {
+                    if (node.type === 'subheader') numSubheaders++;
+                    else numLines++;
+                });
+            });
+            const numCategories = filteredData.length;
+
+            // Load custom banner image from safeStorage if it exists, fallback to default fujickeckbg.jpg
+            const savedImage = safeStorage.getItem('fujirock_hero_image');
+            const bannerSrc = savedImage || 'fujickeckbg.jpg';
+            if (bannerSrc) {
+                const img = new Image();
+                img.onload = () => {
+                    generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, img);
+                };
+                img.onerror = () => {
+                    generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, null);
+                };
+                img.src = bannerSrc;
+            } else {
+                generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, null);
+            }
+        }
+
+        function generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, heroImg) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 250 + (numLines * 35) + (numSubheaders * 35) + (numCategories * 65) + 100;
+
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            ctx.fillStyle = '#1A1A24';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Header Background
+            if (heroImg) {
+                // Draw custom banner image covering header area (y = 0 to 120)
+                ctx.drawImage(heroImg, 0, 0, canvas.width, 120);
+
+                // Draw dark overlay to ensure readability
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                ctx.fillRect(0, 0, canvas.width, 120);
+            } else {
+                // Draw default dark gradient background
+                const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+                grad.addColorStop(0, '#1A1A24');
+                grad.addColorStop(1, '#252538');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, 120);
+            }
+
+            // Header Title (centered)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 36px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('FUJI ROCK FESTIVAL', canvas.width / 2, 70);
+
+            ctx.fillStyle = '#E2E2E9';
+            ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+            ctx.fillText('후지록 페스티벌 준비물 체크리스트', canvas.width / 2, 110);
+
+            // Progress
+            const progressPct = allTotal > 0 ? Math.round((checkedTotal / allTotal) * 100) : 0;
+
+            ctx.fillStyle = '#2D2D3D';
+            drawRoundedRect(ctx, 80, 140, canvas.width - 160, 24, 12);
+            ctx.fill();
+
+            if (checkedTotal > 0) {
+                ctx.fillStyle = '#FF4B4B';
+                const fillWidth = ((canvas.width - 160) * checkedTotal) / allTotal;
+                drawRoundedRect(ctx, 80, 140, fillWidth, 24, 12);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = '#A0A0B0';
+            ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+            ctx.fillText(`선택 항목: ${progressPct}% (${checkedTotal} / ${allTotal})`, canvas.width / 2, 195);
+
+            // Divider
+            ctx.strokeStyle = '#3D3D4D';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(60, 220);
+            ctx.lineTo(canvas.width - 60, 220);
+            ctx.stroke();
+
+            // 3) Draw only checked items
+            let currY = 260;
+            const xLeft = 80;
+
+            for (const catData of filteredData) {
+                // Category header
+                ctx.fillStyle = '#FF8A00';
+                ctx.font = 'bold 26px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(catData.category, xLeft, currY);
+                currY += 45;
+
+                let activeSubheader = false;
+
+                catData.items.forEach(node => {
+                    if (node.type === 'subheader') {
+                        activeSubheader = node.text;
+                        ctx.fillStyle = '#FF4B4B';
+                        ctx.font = 'bold 20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+                        ctx.fillText(`— ${node.text}`, xLeft + 10, currY);
+                        currY += 35;
+                    } else if (node.type === 'item') {
+                        const boxSize = 20;
+                        const boxX = activeSubheader ? xLeft + 20 : xLeft + 10;
+                        const boxY = currY - 18;
+
+                        // Draw checked checkbox
+                        ctx.fillStyle = '#FF4B4B';
+                        drawRoundedRect(ctx, boxX, boxY, boxSize, boxSize, 4);
+                        ctx.fill();
+
+                        // Draw checkmark
+                        ctx.strokeStyle = '#FFFFFF';
+                        ctx.lineWidth = 2.5;
+                        ctx.beginPath();
+                        ctx.moveTo(boxX + 5, boxY + 10);
+                        ctx.lineTo(boxX + 9, boxY + 14);
+                        ctx.lineTo(boxX + 15, boxY + 6);
+                        ctx.stroke();
+
+                        // Draw label text
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.font = '22px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+                        ctx.fillText(node.text, boxX + boxSize + 20, currY);
+                        currY += 35;
+                    }
+                });
+
+                currY += 20;
+            }
+
+            // Draw footer
+            ctx.fillStyle = '#505060';
+            ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('만든이 @sigong © 2026 | Inspired by c86tori', canvas.width / 2, canvas.height - 40);
+
+            // Download trigger
+            try {
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+                const link = document.createElement('a');
+                link.download = 'fujirock_checklist.jpg';
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) {
+                alert('이미지 저장에 실패했습니다: ' + e.message);
+            }
+        }
+
+        // Helper for rounded rectangles on canvas
+        function drawRoundedRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        // Initialize list and setup drag event listeners once on load
+        function init() {
+            const container = document.getElementById('checklistCategories');
+            if (!container) return;
+
+            // Category drag listener (once)
+            makeSortable(container, {
+                rowSelector: '.category-card',
+                handleSelector: '.category-drag-handle',
+                type: 'category'
+            });
+
+            // Item/Subheader drag listener (once, delegated from container)
+            container.addEventListener('pointerdown', e => {
+                if (e.button != null && e.button !== 0) return;
+                const handle = e.target.closest('.item-drag-handle');
+                if (!handle || !container.contains(handle)) return;
+
+                const list = handle.closest('.checklist-list');
+                if (!list) return;
+
+                const row = handle.closest('.checklist-item, .checklist-subheader');
+                if (!row) return;
+
+                e.preventDefault();
+                startDrag(list, row, handle, e, {
+                    rowSelector: '.checklist-item, .checklist-subheader',
+                    handleSelector: '.item-drag-handle',
+                    type: 'item'
+                });
+            });
+
             loadHeroImage();
             renderChecklist();
         }
-    }
 
-    // Draw checklist as a downloadable high-quality mobile JPG image using Canvas API
-    function saveAsImage() {
-        const currentOrder = getSavedOrder();
-
-        // 1) 체크된 항목만 카테고리별로 수집
-        const filteredData = [];
-        let checkedTotal = 0;
-        let allTotal = 0;
-
-        for (const category of currentOrder.categories) {
-            const categoryItems = currentOrder.items[category] || [];
-            const filtered = [];
-            let lastSubheader = null;
-            let subheaderHasItems = false;
-
-            categoryItems.forEach(node => {
-                if (node.type === 'subheader') {
-                    lastSubheader = node;
-                    subheaderHasItems = false;
-                } else if (node.type === 'item') {
-                    allTotal++;
-                    if (node.checked) {
-                        checkedTotal++;
-                        // Add subheader if not already added for this group
-                        if (lastSubheader && !subheaderHasItems) {
-                            filtered.push(lastSubheader);
-                            subheaderHasItems = true;
-                        }
-                        filtered.push(node);
-                    }
-                }
-            });
-
-            if (filtered.length > 0) {
-                filteredData.push({ category, items: filtered });
-            }
-        }
-
-        if (checkedTotal === 0) {
-            alert('선택된 항목이 없습니다. 체크박스를 선택한 후 다시 시도해주세요.');
-            return;
-        }
-
-        // 2) Compute canvas height dynamically
-        let numLines = 0;
-        let numSubheaders = 0;
-        filteredData.forEach(cat => {
-            cat.items.forEach(node => {
-                if (node.type === 'subheader') numSubheaders++;
-                else numLines++;
-            });
-        });
-        const numCategories = filteredData.length;
-
-        // Load custom banner image from safeStorage if it exists, fallback to default fujickeckbg.jpg
-        const savedImage = safeStorage.getItem('fujirock_hero_image');
-        const bannerSrc = savedImage || 'fujickeckbg.jpg';
-        if (bannerSrc) {
-            const img = new Image();
-            img.onload = () => {
-                generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, img);
-            };
-            img.onerror = () => {
-                generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, null);
-            };
-            img.src = bannerSrc;
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
         } else {
-            generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, null);
+            init();
         }
-    }
-
-    function generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, heroImg) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 800;
-        canvas.height = 250 + (numLines * 35) + (numSubheaders * 35) + (numCategories * 65) + 100;
-
-        const ctx = canvas.getContext('2d');
-
-        // Background
-        ctx.fillStyle = '#1A1A24';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Header Background
-        if (heroImg) {
-            // Draw custom banner image covering header area (y = 0 to 120)
-            ctx.drawImage(heroImg, 0, 0, canvas.width, 120);
-            
-            // Draw dark overlay to ensure readability
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-            ctx.fillRect(0, 0, canvas.width, 120);
-        } else {
-            // Draw default dark gradient background
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
-            grad.addColorStop(0, '#1A1A24');
-            grad.addColorStop(1, '#252538');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, 120);
-        }
-
-        // Header Title (centered)
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 36px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('FUJI ROCK FESTIVAL', canvas.width / 2, 70);
-
-        ctx.fillStyle = '#E2E2E9';
-        ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-        ctx.fillText('후지록 페스티벌 준비물 체크리스트', canvas.width / 2, 110);
-
-        // Progress
-        const progressPct = allTotal > 0 ? Math.round((checkedTotal / allTotal) * 100) : 0;
-
-        ctx.fillStyle = '#2D2D3D';
-        drawRoundedRect(ctx, 80, 140, canvas.width - 160, 24, 12);
-        ctx.fill();
-
-        if (checkedTotal > 0) {
-            ctx.fillStyle = '#FF4B4B';
-            const fillWidth = ((canvas.width - 160) * checkedTotal) / allTotal;
-            drawRoundedRect(ctx, 80, 140, fillWidth, 24, 12);
-            ctx.fill();
-        }
-
-        ctx.fillStyle = '#A0A0B0';
-        ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-        ctx.fillText(`선택 항목: ${progressPct}% (${checkedTotal} / ${allTotal})`, canvas.width / 2, 195);
-
-        // Divider
-        ctx.strokeStyle = '#3D3D4D';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(60, 220);
-        ctx.lineTo(canvas.width - 60, 220);
-        ctx.stroke();
-
-        // 3) Draw only checked items
-        let currY = 260;
-        const xLeft = 80;
-
-        for (const catData of filteredData) {
-            // Category header
-            ctx.fillStyle = '#FF8A00';
-            ctx.font = 'bold 26px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText(catData.category, xLeft, currY);
-            currY += 45;
-
-            let activeSubheader = false;
-
-            catData.items.forEach(node => {
-                if (node.type === 'subheader') {
-                    activeSubheader = node.text;
-                    ctx.fillStyle = '#FF4B4B';
-                    ctx.font = 'bold 20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-                    ctx.fillText(`— ${node.text}`, xLeft + 10, currY);
-                    currY += 35;
-                } else if (node.type === 'item') {
-                    const boxSize = 20;
-                    const boxX = activeSubheader ? xLeft + 20 : xLeft + 10;
-                    const boxY = currY - 18;
-
-                    // Draw checked checkbox
-                    ctx.fillStyle = '#FF4B4B';
-                    drawRoundedRect(ctx, boxX, boxY, boxSize, boxSize, 4);
-                    ctx.fill();
-
-                    // Draw checkmark
-                    ctx.strokeStyle = '#FFFFFF';
-                    ctx.lineWidth = 2.5;
-                    ctx.beginPath();
-                    ctx.moveTo(boxX + 5, boxY + 10);
-                    ctx.lineTo(boxX + 9, boxY + 14);
-                    ctx.lineTo(boxX + 15, boxY + 6);
-                    ctx.stroke();
-
-                    // Draw label text
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.font = '22px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-                    ctx.fillText(node.text, boxX + boxSize + 20, currY);
-                    currY += 35;
-                }
-            });
-
-            currY += 20;
-        }
-
-        // Draw footer
-        ctx.fillStyle = '#505060';
-        ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('만든이 @sigong © 2026 | Inspired by c86tori', canvas.width / 2, canvas.height - 40);
-
-        // Download trigger
-        try {
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-            const link = document.createElement('a');
-            link.download = 'fujirock_checklist.jpg';
-            link.href = dataUrl;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (e) {
-            alert('이미지 저장에 실패했습니다: ' + e.message);
-        }
-    }
-
-    // Helper for rounded rectangles on canvas
-    function drawRoundedRect(ctx, x, y, width, height, radius) {
-        ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + width - radius, y);
-        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-        ctx.lineTo(x + width, y + height - radius);
-        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-        ctx.lineTo(x + radius, y + height);
-        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-        ctx.closePath();
-    }
-
-    // Initialize list and setup drag event listeners once on load
-    function init() {
-        const container = document.getElementById('checklistCategories');
-        if (!container) return;
-
-        // Category drag listener (once)
-        makeSortable(container, {
-            rowSelector: '.category-card',
-            handleSelector: '.category-drag-handle',
-            type: 'category'
-        });
-
-        // Item/Subheader drag listener (once, delegated from container)
-        container.addEventListener('pointerdown', e => {
-            if (e.button != null && e.button !== 0) return;
-            const handle = e.target.closest('.item-drag-handle');
-            if (!handle || !container.contains(handle)) return;
-
-            const list = handle.closest('.checklist-list');
-            if (!list) return;
-
-            const row = handle.closest('.checklist-item, .checklist-subheader');
-            if (!row) return;
-
-            e.preventDefault();
-            startDrag(list, row, handle, e, {
-                rowSelector: '.checklist-item, .checklist-subheader',
-                handleSelector: '.item-drag-handle',
-                type: 'item'
-            });
-        });
-
-        loadHeroImage();
-        renderChecklist();
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-</script>
+    </script>
 </body>
+
 </html>
