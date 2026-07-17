@@ -689,8 +689,14 @@
                             <li><strong>🔄 초기화:</strong> 리스트 상태를 완전히 처음 기본값으로 되돌리고 싶을 때 사용합니다.</li>
                         </ul>
                     </div>
+                    <div style="margin-top: 25px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;">
+                        <button class="btn-reset" onclick="closeGuideModal(null)" style="width: auto; padding: 10px 32px; font-weight: 600; border-color: var(--primary); color: var(--primary);">
+                            닫기
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
         <!-- Image Preview Modal -->
         <div id="imageModal" class="modal-overlay" onclick="closeImageModal(event)" style="display: none;">
             <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 600px;">
@@ -706,7 +712,10 @@
                     <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #1A1A24; max-height: 50vh; overflow-y: auto; margin-bottom: 20px;">
                         <img id="previewChecklistImage" src="" alt="Checklist Preview" style="width: 100%; height: auto; display: block;">
                     </div>
-                    <div>
+                    <div style="display: flex; gap: 12px; justify-content: center; width: 100%; flex-wrap: wrap;">
+                        <button class="btn-reset" onclick="closeImageModal(null)" style="width: auto; padding: 10px 24px; border-color: var(--primary); color: var(--primary);">
+                            닫기
+                        </button>
                         <button class="btn-save" onclick="triggerNativeDownload()" style="width: auto; padding: 10px 24px; display: inline-flex; align-items: center; justify-content: center;">
                             ⬇️ 이미지 직접 다운로드
                         </button>
