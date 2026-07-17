@@ -99,7 +99,7 @@ def generate_checklist_image():
         draw.rounded_rectangle([pb_x, pb_y, pb_x + filled_w, pb_y + pb_h], radius=12, fill="#FF4B4B")
         
     # Draw progress text
-    progress_text = f"진행률: {progress_pct}% ({checked_count} / {total_items})"
+    progress_text = f"선택 항목: {progress_pct}% ({checked_count} / {total_items})"
     draw.text((width/2, 185), progress_text, fill="#A0A0B0", font=font_subtitle, anchor="ms")
     
     # Draw divider line
