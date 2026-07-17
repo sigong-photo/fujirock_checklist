@@ -587,9 +587,9 @@
         // Updated checklist matching the provided web URL (Translated to Korean, grouped with subheaders)
         const packingList = {
             "[공통] 공연장 휴대용 배낭": {
-                "[배면 포켓]": ["선크림", "맥주 너클 오프너", "모기 퇴치 스프레이"],
+                "[배면 포켓]": ["선크림", "모기 퇴치 스프레이"],
                 "[사이드 포켓]": ["물병/텀블러"],
-                "[내용물]": ["수건", "판초 우의", "바람막이", "물티슈", "쿨링티슈", "이어플러그", "휴대폰 방수팩"],
+                "[배낭]": ["수건", "판초 우의", "바람막이", "물티슈", "쿨링티슈", "이어플러그", "휴대폰 방수팩", "맥주 너클 오프너"],
                 "<노란 파우치>": ["보조배터리", "USB 케이블류", "헤드랜턴", "AAA 건전지", "지퍼백"],
                 "<빨간 파우치>": ["스포츠 테이핑 테이프", "대일밴드 (반창고)", "손톱깎이", "콘택트렌즈", "휴대용 티슈", "벌레 물린 약", "립밤", "상처 연고", "방수테이프"]
             },
@@ -684,9 +684,12 @@
                         });
                     }
 
-                    // LocalStorage Migration: Rename old item names
+                    // LocalStorage Migration: Rename old item names and subheader
                     if (order.items && order.items["[공통] 공연장 휴대용 배낭"]) {
                         order.items["[공통] 공연장 휴대용 배낭"] = order.items["[공통] 공연장 휴대용 배낭"].map(node => {
+                            if (node.type === 'subheader' && node.text === '[내용물]') {
+                                node.text = '[배낭]';
+                            }
                             if (node.type === 'item' && node.text === "판초 우의 (파랑)") {
                                 node.text = "판초 우의";
                             }
@@ -695,6 +698,25 @@
                             }
                             return node;
                         });
+
+                        // Then relocate "맥주 너클 오프너" to be under [배낭]
+                        let openerNode = null;
+                        order.items["[공통] 공연장 휴대용 배낭"] = order.items["[공통] 공연장 휴대용 배낭"].filter(node => {
+                            if (node.type === 'item' && node.text === "맥주 너클 오프너") {
+                                openerNode = node;
+                                return false; // remove from original position
+                            }
+                            return true;
+                        });
+
+                        if (openerNode) {
+                            const targetIdx = order.items["[공통] 공연장 휴대용 배낭"].findIndex(node => node.type === 'subheader' && node.text === '[배낭]') + 1;
+                            if (targetIdx > 0) {
+                                order.items["[공통] 공연장 휴대용 배낭"].splice(targetIdx, 0, openerNode);
+                            } else {
+                                order.items["[공통] 공연장 휴대용 배낭"].push(openerNode);
+                            }
+                        }
                     }
 
                     // Clean up old subheaders and items that were relocated or renamed
