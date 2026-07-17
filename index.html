@@ -522,6 +522,31 @@
 </div>
 
 <script>
+    // Safe localStorage wrapper to prevent exceptions in Private Browsing / messenger webviews
+    const safeStorage = {
+        getItem(key) {
+            try {
+                return localStorage.getItem(key);
+            } catch (e) {
+                return this[key] || null;
+            }
+        },
+        setItem(key, value) {
+            try {
+                localStorage.setItem(key, value);
+            } catch (e) {
+                this[key] = value;
+            }
+        },
+        removeItem(key) {
+            try {
+                localStorage.removeItem(key);
+            } catch (e) {
+                delete this[key];
+            }
+        }
+    };
+
     // Updated checklist matching the provided web URL (Translated to Korean, grouped with subheaders)
     const packingList = {
         "공연장 휴대용 배낭": {
@@ -556,12 +581,12 @@
 
     // Load custom layout order or fallback to default
     function getSavedOrder() {
-        const saved = localStorage.getItem('fujirock_checklist_order');
+        const saved = safeStorage.getItem('fujirock_checklist_order');
         if (saved) {
             let order = JSON.parse(saved);
             
             // Checkbox State Migration: Convert old fujirock_checked_items Set to inline properties
-            const legacyCheckedRaw = localStorage.getItem('fujirock_checked_items');
+            const legacyCheckedRaw = safeStorage.getItem('fujirock_checked_items');
             if (legacyCheckedRaw) {
                 try {
                     const legacyChecked = JSON.parse(legacyCheckedRaw);
@@ -574,8 +599,8 @@
                             }
                         });
                     }
-                    localStorage.removeItem('fujirock_checked_items');
-                    localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+                    safeStorage.removeItem('fujirock_checked_items');
+                    safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
                 } catch (e) {}
             }
 
@@ -599,16 +624,16 @@
                     delete order.items["회장 휴대용 배낭"];
                 }
             }
-            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
 
-            const collapsedRaw = localStorage.getItem('fujirock_collapsed_categories');
+            const collapsedRaw = safeStorage.getItem('fujirock_collapsed_categories');
             if (collapsedRaw) {
                 try {
                     let collapsed = JSON.parse(collapsedRaw);
                     const cIdx = collapsed.indexOf("회장 휴대용 배낭");
                     if (cIdx !== -1) {
                         collapsed[cIdx] = "공연장 휴대용 배낭";
-                        localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(collapsed));
+                        safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(collapsed));
                     }
                 } catch (e) {}
             }
@@ -622,12 +647,12 @@
         };
 
         // Checkbox State Migration for fresh load fallback
-        const legacyCheckedRaw = localStorage.getItem('fujirock_checked_items');
+        const legacyCheckedRaw = safeStorage.getItem('fujirock_checked_items');
         let checkedSet = new Set();
         if (legacyCheckedRaw) {
             try {
                 checkedSet = new Set(JSON.parse(legacyCheckedRaw));
-                localStorage.removeItem('fujirock_checked_items');
+                safeStorage.removeItem('fujirock_checked_items');
             } catch (e) {}
         }
 
@@ -642,18 +667,18 @@
                 });
             }
         }
-        localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+        safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
         return order;
     }
 
     const currentOrder = getSavedOrder();
 
-    // Load collapsed preference from localStorage, default all collapsed on first run
-    const hasCollapsedPref = localStorage.getItem('fujirock_collapsed_categories');
+    // Load collapsed preference from safeStorage, default all collapsed on first run
+    const hasCollapsedPref = safeStorage.getItem('fujirock_collapsed_categories');
     let collapsedCategories;
     if (hasCollapsedPref === null) {
         collapsedCategories = new Set(Object.keys(packingList));
-        localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+        safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
     } else {
         collapsedCategories = new Set(JSON.parse(hasCollapsedPref));
     }
@@ -782,7 +807,7 @@
         document.addEventListener('pointerup', onUp);
     }
 
-    // Save custom category and items layout order to localStorage
+    // Save custom category and items layout order to safeStorage
     function saveCurrentOrder() {
         const order = {
             categories: [],
@@ -811,7 +836,7 @@
             }
         });
         
-        localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+        safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
     }
 
     // Toggle collapse/expand status of a category card
@@ -824,7 +849,7 @@
             card.classList.add('collapsed');
             collapsedCategories.add(category);
         }
-        localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+        safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
     }
 
     // Toggle Edit Mode
@@ -866,10 +891,10 @@
             if (collapsedCategories.has(oldName)) {
                 collapsedCategories.delete(oldName);
                 collapsedCategories.add(newName);
-                localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+                safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
             }
 
-            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
             renderChecklist();
         }
     }
@@ -885,10 +910,10 @@
 
             if (collapsedCategories.has(category)) {
                 collapsedCategories.delete(category);
-                localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+                safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
             }
 
-            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
             renderChecklist();
         }
     }
@@ -904,7 +929,7 @@
 
             order.items[category][index].text = newText;
 
-            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
             renderChecklist();
         }
     }
@@ -914,7 +939,7 @@
         const order = getSavedOrder();
         if (order.items[category] && order.items[category][index]) {
             order.items[category].splice(index, 1);
-            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
             renderChecklist();
         }
     }
@@ -924,7 +949,7 @@
         const order = getSavedOrder();
         if (order.items[category]) {
             order.items[category].push({ type: type, text: '' });
-            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
             
             // Set focus flag for this index
             focusAfterRender = { category: category, index: order.items[category].length - 1 };
@@ -939,7 +964,7 @@
         const newCatName = `새 카테고리 ${order.categories.length + 1}`;
         order.categories.push(newCatName);
         order.items[newCatName] = [];
-        localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+        safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
         
         focusAfterRender = { category: newCatName, index: 'name' };
         
@@ -1271,7 +1296,7 @@
                 // Ensure card is expanded to make inputs visible/focusable
                 card.classList.remove('collapsed');
                 collapsedCategories.delete(category);
-                localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+                safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
 
                 if (index === 'name') {
                     const input = card.querySelector('.category-title-input');
@@ -1298,12 +1323,12 @@
         updateProgress();
     }
 
-    // Toggle check status and sync to localStorage
+    // Toggle check status and sync to safeStorage
     function toggleItem(category, index, isChecked) {
         const order = getSavedOrder();
         if (order.items[category] && order.items[category][index]) {
             order.items[category][index].checked = isChecked;
-            localStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+            safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
         }
         updateProgress();
     }
@@ -1368,11 +1393,11 @@
     // Clear state
     function resetAll() {
         if (confirm("모든 체크 상태와 항목 순서를 초기화하시겠습니까?")) {
-            localStorage.removeItem('fujirock_checked_items');
-            localStorage.removeItem('fujirock_checklist_order');
-            localStorage.removeItem('fujirock_collapsed_categories');
+            safeStorage.removeItem('fujirock_checked_items');
+            safeStorage.removeItem('fujirock_checklist_order');
+            safeStorage.removeItem('fujirock_collapsed_categories');
             collapsedCategories = new Set(Object.keys(packingList));
-            localStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
+            safeStorage.setItem('fujirock_collapsed_categories', JSON.stringify(Array.from(collapsedCategories)));
             renderChecklist();
         }
     }
@@ -1564,8 +1589,9 @@
     }
 
     // Initialize list and setup drag event listeners once on load
-    window.onload = () => {
+    function init() {
         const container = document.getElementById('checklistCategories');
+        if (!container) return;
 
         // Category drag listener (once)
         makeSortable(container, {
@@ -1595,7 +1621,13 @@
         });
 
         renderChecklist();
-    };
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 </script>
 </body>
 </html>
