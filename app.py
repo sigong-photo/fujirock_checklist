@@ -267,7 +267,7 @@ def main():
     
     st.markdown(
         "<div style='text-align: center; color: #a0a0b0; font-size: 0.95rem; margin-top: -10px; margin-bottom: 15px;'>"
-        "⠿ 손잡이로 드래그하여 정렬, 탭으로 확인"
+        "⠿ 마우스로 드래그 하여 항목 위치 변경 가능, 탭으로 확인"
         "</div>", 
         unsafe_allow_html=True
     )
