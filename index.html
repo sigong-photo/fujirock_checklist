@@ -38,7 +38,10 @@
 
         /* Hero Header */
         .hero {
-            background: linear-gradient(135deg, #1A1A24 0%, #252538 100%);
+            background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('_LGM3461.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 40px 20px;
@@ -1529,9 +1532,10 @@
         });
         const numCategories = filteredData.length;
 
-        // Load custom banner image from safeStorage if it exists
+        // Load custom banner image from safeStorage if it exists, fallback to default _LGM3461.jpg
         const savedImage = safeStorage.getItem('fujirock_hero_image');
-        if (savedImage) {
+        const bannerSrc = savedImage || '_LGM3461.jpg';
+        if (bannerSrc) {
             const img = new Image();
             img.onload = () => {
                 generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, img);
@@ -1539,7 +1543,7 @@
             img.onerror = () => {
                 generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, null);
             };
-            img.src = savedImage;
+            img.src = bannerSrc;
         } else {
             generateCanvas(filteredData, checkedTotal, allTotal, numLines, numSubheaders, numCategories, null);
         }
