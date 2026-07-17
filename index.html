@@ -1965,7 +1965,8 @@
             // Download trigger & Preview Modal popup
             try {
                 const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-                
+                window.currentChecklistDataUrl = dataUrl;
+
                 // Show in preview modal first (highly recommended for iOS / Kakao / Instagram)
                 const previewImg = document.getElementById('previewChecklistImage');
                 previewImg.src = dataUrl;
@@ -1976,15 +1977,34 @@
                     modal.classList.add('show');
                 }, 10);
                 
-                window.currentChecklistDataUrl = dataUrl;
+                const triggerAutoDownload = (url) => {
+                    const link = document.createElement('a');
+                    link.download = 'fujirock_checklist.jpg';
+                    link.href = url;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
 
-                // Attempt automatic download for desktop/compatible browsers
-                const link = document.createElement('a');
-                link.download = 'fujirock_checklist.jpg';
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                // Attempt Native Web Share Sheet (allows saving directly to Photos on iOS via "Save Image")
+                try {
+                    const file = dataURLtoFile(dataUrl, 'fujirock_checklist.jpg');
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: '후지록 준비물 체크리스트',
+                            text: '후지록 페스티벌 준비물 체크리스트'
+                        }).catch(err => {
+                            console.log("Native share sheet cancelled or dismissed:", err);
+                        });
+                    } else {
+                        // Desktop automatic download fallback
+                        triggerAutoDownload(dataUrl);
+                    }
+                } catch (shareErr) {
+                    console.log("Native share sheet not available, fallback to direct download:", shareErr);
+                    triggerAutoDownload(dataUrl);
+                }
             } catch (e) {
                 alert('이미지 저장에 실패했습니다: ' + e.message);
             }
@@ -2076,6 +2096,18 @@
             setTimeout(() => {
                 modal.style.display = 'none';
             }, 300);
+        }
+
+        function dataURLtoFile(dataurl, filename) {
+            const arr = dataurl.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new File([u8arr], filename, { type: mime });
         }
 
         if (document.readyState === 'loading') {
