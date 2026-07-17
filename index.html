@@ -454,18 +454,25 @@
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            display: flex;
+            display: none;
             align-items: flex-start;
             justify-content: center;
             z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
             overflow-y: auto;
             padding: 40px 10px;
             box-sizing: border-box;
         }
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes modalScaleIn {
+            from { transform: scale(0.9); }
+            to { transform: scale(1); }
+        }
         .modal-overlay.show {
-            opacity: 1;
+            display: flex;
+            animation: modalFadeIn 0.25s ease forwards;
         }
         .modal-content {
             background: var(--bg-card);
@@ -475,13 +482,12 @@
             max-width: 550px;
             margin: auto 0;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            transform: scale(0.9);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             padding: 25px;
             color: var(--text-main);
+            transform: scale(0.9);
         }
         .modal-overlay.show .modal-content {
-            transform: scale(1);
+            animation: modalScaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         .modal-header {
             display: flex;
@@ -666,7 +672,7 @@
     </div>
 
     <!-- Guide Modal -->
-    <div id="guideModal" class="modal-overlay" onclick="closeGuideModal(event)" style="display: none;">
+    <div id="guideModal" class="modal-overlay" onclick="closeGuideModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <h2>ℹ️ 후지록 체크리스트 사용 가이드</h2>
@@ -704,7 +710,7 @@
     </div>
 
     <!-- Image Preview Modal -->
-    <div id="imageModal" class="modal-overlay" onclick="closeImageModal(event)" style="display: none;">
+    <div id="imageModal" class="modal-overlay" onclick="closeImageModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 600px;">
             <div class="modal-header">
                 <h2>📸 저장용 이미지 미리보기</h2>
@@ -1986,12 +1992,9 @@
                 previewImg.src = dataUrl;
                 
                 const modal = document.getElementById('imageModal');
-                modal.style.display = 'flex';
                 modal.scrollTop = 0;
                 document.body.style.overflow = 'hidden';
-                setTimeout(() => {
-                    modal.classList.add('show');
-                }, 10);
+                modal.classList.add('show');
                 
                 const triggerAutoDownload = (url) => {
                     const link = document.createElement('a');
@@ -2079,12 +2082,9 @@
 
         function openGuideModal() {
             const modal = document.getElementById('guideModal');
-            modal.style.display = 'flex';
             modal.scrollTop = 0;
             document.body.style.overflow = 'hidden';
-            setTimeout(() => {
-                modal.classList.add('show');
-            }, 10);
+            modal.classList.add('show');
         }
 
         function closeGuideModal(e) {
@@ -2092,9 +2092,6 @@
             const modal = document.getElementById('guideModal');
             modal.classList.remove('show');
             document.body.style.overflow = '';
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
         }
 
         function triggerNativeDownload() {
@@ -2113,9 +2110,6 @@
             const modal = document.getElementById('imageModal');
             modal.classList.remove('show');
             document.body.style.overflow = '';
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
         }
 
         function dataURLtoFile(dataurl, filename) {
