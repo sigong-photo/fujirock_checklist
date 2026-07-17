@@ -38,7 +38,7 @@
 
         /* Hero Header */
         .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('fujickeckbg.jpg');
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('fujickeckbg.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -53,16 +53,18 @@
         .hero h1 {
             font-size: 2.25rem;
             font-weight: 700;
-            background: linear-gradient(90deg, #FF4B4B 0%, #FF8A00 100%);
+            background: linear-gradient(90deg, #FF5B5B 0%, #FF9F1A 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 12px;
             letter-spacing: -0.5px;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95));
         }
 
         .hero p {
-            color: var(--text-sub);
+            color: rgba(255, 255, 255, 0.95);
             font-size: 1.05rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
         }
 
         /* Stats & Controls Section */
@@ -912,7 +914,7 @@
         const hero = document.getElementById('heroContainer');
         const resetBtn = document.getElementById('heroResetBtn');
         if (savedImage) {
-            hero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${savedImage})`;
+            hero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${savedImage})`;
             hero.style.backgroundSize = 'cover';
             hero.style.backgroundPosition = 'center';
             if (resetBtn) resetBtn.style.display = 'inline-block';
@@ -1566,7 +1568,7 @@
             ctx.drawImage(heroImg, 0, 0, canvas.width, 120);
             
             // Draw dark overlay to ensure readability
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
             ctx.fillRect(0, 0, canvas.width, 120);
         } else {
             // Draw default dark gradient background
@@ -1583,7 +1585,7 @@
         ctx.textAlign = 'center';
         ctx.fillText('FUJI ROCK FESTIVAL', canvas.width / 2, 70);
 
-        ctx.fillStyle = '#A0A0B0';
+        ctx.fillStyle = '#E2E2E9';
         ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
         ctx.fillText('후지록 페스티벌 준비물 체크리스트', canvas.width / 2, 110);
 
