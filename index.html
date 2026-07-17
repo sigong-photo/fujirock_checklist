@@ -589,24 +589,28 @@
             "공연장 휴대용 배낭": {
                 "[배면 포켓]": ["선크림", "맥주 너클 오프너", "모기 퇴치 스프레이"],
                 "[사이드 포켓]": ["물병/텀블러"],
-                "[내용물]": ["수건", "판초 우의 (파랑)", "플리스"],
-                "<노란 파우치>": ["보조배터리", "USB 케이블류", "헤드랜턴", "AAA 건전지"],
-                "<빨간 파우치>": ["스포츠 테이핑 테이프", "대일밴드 (반창고)", "손톱깎이", "콘택트렌즈", "휴대용 티슈"]
+                "[내용물]": ["수건", "판초 우의 (파랑)", "플리스", "물티슈", "쿨링티슈", "이어플러그", "휴대폰 방수팩"],
+                "<노란 파우치>": ["보조배터리", "USB 케이블류", "헤드랜턴", "AAA 건전지", "지퍼백"],
+                "<빨간 파우치>": ["스포츠 테이핑 테이프", "대일밴드 (반창고)", "손톱깎이", "콘택트렌즈", "휴대용 티슈", "벌레 물린 약", "립밤", "상처 연고", "방수테이프"]
             },
             "숙소 배낭": {
                 "[등 포켓]": ["지갑 (카드류 제외)"],
-                "[내용물]": ["비닐봉지", "페스티벌용 T셔츠 (3장)", "속옷 (1장)", "양말 (1켤레)", "여분 수건", "3일차 손수건", "헤어 스프레이", "스킨/토너", "크림", "면도기"]
+                "[내용물]": ["캐리어", "보조가방", "장바구니", "비닐봉지", "페스티벌용 T셔츠 (3장)", "속옷 (1장)", "양말 (1켤레)", "여분 수건", "3일차 손수건", "헤어 스프레이", "스킨/토너", "크림", "면도기", "슬리퍼", "머리끈"],
+                "[충전/가전]": ["멀티플러그 (돼지코)", "충전 어댑터"],
+                "[위생/세안]": ["샴푸", "바디워시", "세안제", "치약", "칫솔", "빗", "토너패드", "클렌징 패드", "마스크팩"],
+                "[의약품]": ["감기약", "해열·진통제", "소화제", "변비약", "지사제"],
+                "[빨래 용품]": ["세탁세제", "세탁망", "접이식 옷걸이"]
             },
             "차에 두고 갈 것": {
-                "": ["에어매트", "미니 아이스박스", "접이식 우산"],
-                "[대시보드]": ["주차권", "손목밴드 (입장권)", "타임테이블"],
-                "[차박 박스]": ["바디 시트", "취침용 T셔츠", "속옷 (2장)", "양말 (1켤레)", "복귀용 여분 옷", "비닐봉지 (여분)", "2일차 수건", "3일차 수건", "막 쓰는 수건", "2일차 손수건 (빨아서 쓰기)", "모자 (캡)"],
-                "[기타 박스]": ["장화", "샌들", "차량용 햇빛 가리개"],
+                "": ["에어매트", "미니 아이스박스", "접이식 우산", "돗자리", "손선풍기"],
+                "[차박 박스]": ["바디 시트", "취침용 T셔츠", "속옷 (2장)", "양말 (1켤레)", "복귀용 여분 옷", "비닐봉지 (여분)", "2일차 수건", "3일차 수건", "막 쓰는 수건", "2일차 손수건 (빨아서 쓰기)", "모자 (캡)", "이어플러그"],
+                "[기타 박스]": ["장화", "샌들", "차량용 햇빛 가리개", "주방세제", "수세미", "일회용 장갑", "네임펜"],
                 "[노란 배낭]": ["접이식 의자 (대)"]
             },
             "당일 챙길 것": {
-                "<카드 지갑>": ["건강보험증", "운전면허증", "현금"],
-                "<기타>": ["손수건", "집 열쇠", "차 열쇠", "애플워치", "애플워치 충전기/배터리", "멀티탭", "스킨/토너 (여행용)", "크림 (여행용)", "면도기 (여분)", "무선 이어폰"]
+                "<여권/결제>": ["여권", "항공권", "여행자보험", "해외결제·외화카드", "일본 교통카드", "eSIM", "엔화 현금"],
+                "<카드 지갑>": ["건강보험증", "운전면허증", "신용카드"],
+                "<티켓/기타>": ["주차권", "손목밴드 (입장권)", "타임테이블", "손수건", "집 열쇠", "차 열쇠", "애플워치", "애플워치 충전기/배터리", "멀티탭", "스킨/토너 (여행용)", "크림 (여행용)", "면도기 (여분)", "무선 이어폰", "카메라", "메모리카드"]
             },
             "당일 착용할 것": {
                 "": ["선글라스", "햇 (모자)", "기능성 이너웨어", "기능성 상의", "기능성 하의", "T셔츠", "속건성 바지", "속옷", "손수건", "스마트폰"]
@@ -668,7 +672,60 @@
                             return node.text !== "소염진통제 (로키소닌)" && node.text !== "파스 (로키소닌 패치)" && node.text !== "페이스 시트";
                         });
                     }
-                    safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+
+                    // Clean up old subheaders and items that were relocated or renamed
+                    if (order.items && order.items["당일 챙길 것"]) {
+                        order.items["당일 챙길 것"] = order.items["당일 챙길 것"].filter(node => {
+                            return node.text !== "<기타>" && node.text !== "현금";
+                        });
+                    }
+                    if (order.items && order.items["차에 두고 갈 것"]) {
+                        order.items["차에 두고 갈 것"] = order.items["차에 두고 갈 것"].filter(node => {
+                            return node.text !== "[대시보드]";
+                        });
+                    }
+
+                    // Auto-merge new default items that don't exist in the loaded order
+                    let orderChanged = false;
+                    for (const category of Object.keys(packingList)) {
+                        if (!order.categories.includes(category)) {
+                            order.categories.push(category);
+                            order.items[category] = [];
+                            orderChanged = true;
+                        }
+                    }
+                    for (const category of order.categories) {
+                        const defaultCatData = packingList[category];
+                        if (!defaultCatData) continue;
+                        if (!order.items[category]) {
+                            order.items[category] = [];
+                            orderChanged = true;
+                        }
+                        const existingTexts = new Set(order.items[category].map(n => n.text));
+                        for (const [subheader, defaultItems] of Object.entries(defaultCatData)) {
+                            if (subheader && !existingTexts.has(subheader)) {
+                                order.items[category].push({ type: 'subheader', text: subheader });
+                                existingTexts.add(subheader);
+                                orderChanged = true;
+                            }
+                            let targetIdx = order.items[category].length;
+                            if (subheader) {
+                                targetIdx = order.items[category].findIndex(n => n.type === 'subheader' && n.text === subheader) + 1;
+                                if (targetIdx === 0) targetIdx = order.items[category].length;
+                            }
+                            defaultItems.forEach(item => {
+                                if (!existingTexts.has(item)) {
+                                    order.items[category].splice(targetIdx, 0, { type: 'item', text: item, checked: false });
+                                    existingTexts.add(item);
+                                    targetIdx++;
+                                    orderChanged = true;
+                                }
+                            });
+                        }
+                    }
+                    if (orderChanged) {
+                        safeStorage.setItem('fujirock_checklist_order', JSON.stringify(order));
+                    }
 
                     const collapsedRaw = safeStorage.getItem('fujirock_collapsed_categories');
                     if (collapsedRaw) {
