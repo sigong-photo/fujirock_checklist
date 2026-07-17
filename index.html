@@ -663,67 +663,68 @@
                 &copy; 2026 | Inspired by c86tori
             </p>
         </footer>
+    </div>
 
-        <!-- Guide Modal -->
-        <div id="guideModal" class="modal-overlay" onclick="closeGuideModal(event)" style="display: none;">
-            <div class="modal-content" onclick="event.stopPropagation()">
-                <div class="modal-header">
-                    <h2>ℹ️ 후지록 체크리스트 사용 가이드</h2>
-                    <button class="modal-close-btn" onclick="closeGuideModal(null)">&times;</button>
+    <!-- Guide Modal -->
+    <div id="guideModal" class="modal-overlay" onclick="closeGuideModal(event)" style="display: none;">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>ℹ️ 후지록 체크리스트 사용 가이드</h2>
+                <button class="modal-close-btn" onclick="closeGuideModal(null)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="guide-section">
+                    <h3>💡 기본 기능</h3>
+                    <ul>
+                        <li><strong>✅ 체크리스트 관리:</strong> 준비물을 선택하면 진행률 상태링과 진행률 백분율이 실시간 업데이트됩니다.</li>
+                        <li><strong>💾 자동 저장:</strong> 체크 상태, 정렬 상태, 배너 등 모든 변경사항은 브라우저에 즉시 안전하게 자동 저장됩니다.</li>
+                    </ul>
                 </div>
-                <div class="modal-body">
-                    <div class="guide-section">
-                        <h3>💡 기본 기능</h3>
-                        <ul>
-                            <li><strong>✅ 체크리스트 관리:</strong> 준비물을 선택하면 진행률 상태링과 진행률 백분율이 실시간 업데이트됩니다.</li>
-                            <li><strong>💾 자동 저장:</strong> 체크 상태, 정렬 상태, 배너 등 모든 변경사항은 브라우저에 즉시 안전하게 자동 저장됩니다.</li>
-                        </ul>
-                    </div>
-                    <div class="guide-section">
-                        <h3>✏️ 편집 모드 (커스터마이징)</h3>
-                        <ul>
-                            <li><strong>↕️ 항목 위치 변경 (드래그):</strong> <code>✏️ 편집 모드</code>를 누르고 좌측 손잡이(⠿)나 항목 자체를 마우스/손가락으로 드래그하여 순서를 마음대로 바꿀 수 있습니다.</li>
-                            <li><strong>📷 나만의 배너 업로드:</strong> 편집 모드 상태에서 상단 배너 영역의 <code>📷 배너 이미지 변경</code> 단추를 누르면 원하는 사진으로 커스텀 배너를 지정할 수 있습니다.</li>
-                        </ul>
-                    </div>
-                    <div class="guide-section">
-                        <h3>📸 이미지 내보내기 & 리셋</h3>
-                        <ul>
-                            <li><strong>📸 이미지로 저장 (JPG):</strong> <code>📸 이미지로 저장</code> 단추를 누르면 내가 체크한 항목과 진행률(선택 항목 비율)이 담긴 고해상도 JPG 이미지 카드를 다운로드할 수 있어, 오프라인이나 락페 현장에서 사진첩으로 빠르게 볼 수 있습니다.</li>
-                            <li><strong>🔄 초기화:</strong> 리스트 상태를 완전히 처음 기본값으로 되돌리고 싶을 때 사용합니다.</li>
-                        </ul>
-                    </div>
-                    <div style="margin-top: 25px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;">
-                        <button class="btn-reset" onclick="closeGuideModal(null)" style="width: auto; padding: 10px 32px; font-weight: 600; border-color: var(--primary); color: var(--primary);">
-                            닫기
-                        </button>
-                    </div>
+                <div class="guide-section">
+                    <h3>✏️ 편집 모드 (커스터마이징)</h3>
+                    <ul>
+                        <li><strong>↕️ 항목 위치 변경 (드래그):</strong> <code>✏️ 편집 모드</code>를 누르고 좌측 손잡이(⠿)나 항목 자체를 마우스/손가락으로 드래그하여 순서를 마음대로 바꿀 수 있습니다.</li>
+                        <li><strong>📷 나만의 배너 업로드:</strong> 편집 모드 상태에서 상단 배너 영역의 <code>📷 배너 이미지 변경</code> 단추를 누르면 원하는 사진으로 커스텀 배너를 지정할 수 있습니다.</li>
+                    </ul>
+                </div>
+                <div class="guide-section">
+                    <h3>📸 이미지 내보내기 & 리셋</h3>
+                    <ul>
+                        <li><strong>📸 이미지로 저장 (JPG):</strong> <code>📸 이미지로 저장</code> 단추를 누르면 내가 체크한 항목과 진행률(선택 항목 비율)이 담긴 고해상도 JPG 이미지 카드를 다운로드할 수 있어, 오프라인이나 락페 현장에서 사진첩으로 빠르게 볼 수 있습니다.</li>
+                        <li><strong>🔄 초기화:</strong> 리스트 상태를 완전히 처음 기본값으로 되돌리고 싶을 때 사용합니다.</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 25px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;">
+                    <button class="btn-reset" onclick="closeGuideModal(null)" style="width: auto; padding: 10px 32px; font-weight: 600; border-color: var(--primary); color: var(--primary);">
+                        닫기
+                    </button>
                 </div>
             </div>
         </div>
-        <!-- Image Preview Modal -->
-        <div id="imageModal" class="modal-overlay" onclick="closeImageModal(event)" style="display: none;">
-            <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 600px;">
-                <div class="modal-header">
-                    <h2>📸 저장용 이미지 미리보기</h2>
-                    <button class="modal-close-btn" onclick="closeImageModal(null)">&times;</button>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="modal-overlay" onclick="closeImageModal(event)" style="display: none;">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>📸 저장용 이미지 미리보기</h2>
+                <button class="modal-close-btn" onclick="closeImageModal(null)">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 15px; line-height: 1.4; text-align: left;">
+                    📱 <strong>아이폰/안드로이드</strong> 또는 <strong>카카오톡/인스타그램 웹뷰</strong> 환경에서는<br>
+                    아래 이미지를 <strong>길게 꾹 누른 뒤 [사진 앱에 추가]</strong> 또는 <strong>[이미지 저장]</strong>을 눌러 갤러리에 저장해 주세요!
+                </p>
+                <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #1A1A24; max-height: 50vh; overflow-y: auto; margin-bottom: 20px;">
+                    <img id="previewChecklistImage" src="" alt="Checklist Preview" style="width: 100%; height: auto; display: block;">
                 </div>
-                <div class="modal-body" style="text-align: center;">
-                    <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 15px; line-height: 1.4; text-align: left;">
-                        📱 <strong>아이폰/안드로이드</strong> 또는 <strong>카카오톡/인스타그램 웹뷰</strong> 환경에서는<br>
-                        아래 이미지를 <strong>길게 꾹 누른 뒤 [사진 앱에 추가]</strong> 또는 <strong>[이미지 저장]</strong>을 눌러 갤러리에 저장해 주세요!
-                    </p>
-                    <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #1A1A24; max-height: 50vh; overflow-y: auto; margin-bottom: 20px;">
-                        <img id="previewChecklistImage" src="" alt="Checklist Preview" style="width: 100%; height: auto; display: block;">
-                    </div>
-                    <div style="display: flex; gap: 12px; justify-content: center; width: 100%; flex-wrap: wrap;">
-                        <button class="btn-reset" onclick="closeImageModal(null)" style="width: auto; padding: 10px 24px; border-color: var(--primary); color: var(--primary);">
-                            닫기
-                        </button>
-                        <button class="btn-save" onclick="triggerNativeDownload()" style="width: auto; padding: 10px 24px; display: inline-flex; align-items: center; justify-content: center;">
-                            ⬇️ 이미지 직접 다운로드
-                        </button>
-                    </div>
+                <div style="display: flex; gap: 12px; justify-content: center; width: 100%; flex-wrap: wrap;">
+                    <button class="btn-reset" onclick="closeImageModal(null)" style="width: auto; padding: 10px 24px; border-color: var(--primary); color: var(--primary);">
+                        닫기
+                    </button>
+                    <button class="btn-save" onclick="triggerNativeDownload()" style="width: auto; padding: 10px 24px; display: inline-flex; align-items: center; justify-content: center;">
+                        ⬇️ 이미지 직접 다운로드
+                    </button>
                 </div>
             </div>
         </div>
@@ -1986,6 +1987,8 @@
                 
                 const modal = document.getElementById('imageModal');
                 modal.style.display = 'flex';
+                modal.scrollTop = 0;
+                document.body.style.overflow = 'hidden';
                 setTimeout(() => {
                     modal.classList.add('show');
                 }, 10);
@@ -2077,6 +2080,8 @@
         function openGuideModal() {
             const modal = document.getElementById('guideModal');
             modal.style.display = 'flex';
+            modal.scrollTop = 0;
+            document.body.style.overflow = 'hidden';
             setTimeout(() => {
                 modal.classList.add('show');
             }, 10);
@@ -2086,6 +2091,7 @@
             if (e && e.target !== e.currentTarget) return;
             const modal = document.getElementById('guideModal');
             modal.classList.remove('show');
+            document.body.style.overflow = '';
             setTimeout(() => {
                 modal.style.display = 'none';
             }, 300);
@@ -2106,6 +2112,7 @@
             if (e && e.target !== e.currentTarget) return;
             const modal = document.getElementById('imageModal');
             modal.classList.remove('show');
+            document.body.style.overflow = '';
             setTimeout(() => {
                 modal.style.display = 'none';
             }, 300);
