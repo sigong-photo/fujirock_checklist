@@ -817,10 +817,10 @@
             "[공통] 당일 챙길 것": {
                 "<여권/결제>": ["여권", "항공권", "여행자보험", "일본 교통카드", "eSIM", "엔화 현금"],
                 "<카드 지갑>": ["운전면허증", "신용카드"],
-                "<티켓/기타>": ["주차권", "손목밴드 (입장권)", "타임테이블", "손수건", "차 열쇠", "애플워치", "애플워치 충전기/배터리", "멀티탭", "스킨/토너 (여행용)", "크림 (여행용)", "면도기 (여분)", "무선 이어폰", "카메라", "메모리카드"]
+                "<티켓/기타>": ["주차권", "손목밴드 (입장권)", "후지락앱", "손수건", "차 열쇠", "애플워치", "애플워치 충전기/배터리", "멀티탭", "스킨/토너 (여행용)", "크림 (여행용)", "면도기 (여분)", "무선 이어폰", "카메라", "메모리카드"]
             },
             "[공통] 당일 착용할 것": {
-                "": ["선글라스", "햇 (모자)", "기능성 이너웨어", "기능성 상의", "기능성 하의", "T셔츠", "속건성 바지", "속옷", "손수건", "스마트폰"]
+                "": ["선글라스", "모자", "기능성 이너웨어", "기능성 상의", "기능성 하의", "T셔츠", "속건성 바지", "속옷", "손수건", "스마트폰"]
             },
             "[숙소 이용자용] 캐리어": {
                 "[등 포켓]": ["지갑 (카드류 제외)"],
@@ -890,9 +890,19 @@
 
                     // LocalStorage Migration: Update old subheader names to keep existing sessions synced
                     if (order.items && order.items["[공통] 당일 챙길 것"]) {
-                        order.items["[공통] 당일 챙길 것"] = order.items["[공통] 당일 챙길 것"].map(node => {
-                            if (node.type === 'subheader' && node.text === '<카드 지갑 (UnderTheSun)>') {
-                                node.text = '<카드 지갑>';
+                        order.items["[공통] 당일 챙길 것"] = order.items["[공통] 당일 챙길 것"].filter(node => {
+                            return node.text !== "<기타>" && node.text !== "현금" && node.text !== "건강보험증" && node.text !== "집 열쇠" && node.text !== "해외결제·외화카드" && node.text !== "해외결제 가능 신용카드";
+                        }).map(node => {
+                            if (node.type === 'item' && node.text === "타임테이블") {
+                                node.text = "후지락앱";
+                            }
+                            return node;
+                        });
+                    }
+                    if (order.items && order.items["[공통] 당일 착용할 것"]) {
+                        order.items["[공통] 당일 착용할 것"] = order.items["[공통] 당일 착용할 것"].map(node => {
+                            if (node.type === 'item' && node.text === "햇 (모자)") {
+                                node.text = "모자";
                             }
                             return node;
                         });
@@ -940,12 +950,7 @@
                         }
                     }
 
-                    // Clean up old subheaders and items that were relocated or renamed
-                    if (order.items && order.items["[공통] 당일 챙길 것"]) {
-                        order.items["[공통] 당일 챙길 것"] = order.items["[공통] 당일 챙길 것"].filter(node => {
-                            return node.text !== "<기타>" && node.text !== "현금" && node.text !== "건강보험증" && node.text !== "집 열쇠" && node.text !== "해외결제·외화카드" && node.text !== "해외결제 가능 신용카드";
-                        });
-                    }
+
                     if (order.items && order.items["[캠핑/차박용] 야영 및 차량 보관"]) {
                         order.items["[캠핑/차박용] 야영 및 차량 보관"] = order.items["[캠핑/차박용] 야영 및 차량 보관"].filter(node => {
                             return node.text !== "[대시보드]";
