@@ -145,7 +145,7 @@ def generate_checklist_image():
         curr_y += 20
         
     # Draw footer
-    draw.text((width/2, height - 40), "만든이 @sigong © 2026", fill="#505060", font=font_subtitle, anchor="ms")
+    draw.text((width/2, height - 40), "만든이 @sigong © 2026 | Inspired by c86tori", fill="#505060", font=font_subtitle, anchor="ms")
     
     # Save image to buffer and return bytes
     buf = io.BytesIO()
@@ -324,7 +324,7 @@ def main():
         st.button("🔄 초기화", on_click=reset_checklist, key="reset_btn_bottom")
 
     # Footer
-    st.markdown("<p style='text-align: center; color: #a0a0b0; margin-top: 50px;'>만든이 @sigong &copy; 2026</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #a0a0b0; margin-top: 50px;'>만든이 @sigong &copy; 2026 | Inspired by c86tori</p>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
