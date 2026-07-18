@@ -85,7 +85,7 @@ def generate_checklist_image():
         
     # Draw header (No emojis to prevent tofu boxes)
     draw.text((width/2, 60), "FUJI ROCK FESTIVAL", fill="#FF8A00", font=font_title, anchor="ms")
-    draw.text((width/2, 100), "후지록 페스티벌 준비물 체크리스트", fill="#FFFFFF", font=font_subtitle, anchor="ms")
+    draw.text((width/2, 100), "CHECKLIST", fill="#FFFFFF", font=font_subtitle, anchor="ms")
     
     # Calculate progress
     progress_pct = int((checked_count / total_items) * 100) if total_items > 0 else 0

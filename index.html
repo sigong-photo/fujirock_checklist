@@ -583,6 +583,7 @@
         <!-- Header -->
         <div class="hero" id="heroContainer">
             <h1>🎸 FUJI ROCK FESTIVAL 🏔️</h1>
+            <p style="font-size: 1.15rem; font-weight: 700; letter-spacing: 3px; color: rgba(255, 255, 255, 0.85); margin: 5px 0 0 0; text-transform: uppercase; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));">CHECKLIST</p>
             <div id="heroEditControls" style="display: none; margin-top: 15px; gap: 10px; justify-content: center;">
                 <button class="btn-reset" onclick="triggerHeroImageUpload()"
                     style="font-size: 0.85rem; padding: 6px 12px; border-color: var(--primary); color: var(--primary); cursor: pointer;">
@@ -1938,8 +1939,8 @@
             ctx.fillText('FUJI ROCK FESTIVAL', canvas.width / 2, 70);
 
             ctx.fillStyle = '#E2E2E9';
-            ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
-            ctx.fillText('후지록 페스티벌 준비물 체크리스트', canvas.width / 2, 110);
+            ctx.font = 'bold 20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+            ctx.fillText('CHECKLIST', canvas.width / 2, 110);
 
             // Progress
             const progressPct = allTotal > 0 ? Math.round((checkedTotal / allTotal) * 100) : 0;
