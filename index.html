@@ -276,6 +276,7 @@
         body.is-sorting * {
             user-select: none !important;
             -webkit-user-select: none !important;
+            touch-action: none !important;
         }
 
         .checklist-list {
@@ -837,6 +838,7 @@
                             <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-sub); font-size: 0.92rem; line-height: 1.5; list-style-type: disc;">
                                 <li><strong>드래그 정렬 시 체크 상태 유지:</strong> 일반 모드 및 편집 모드 전체에서 준비물 항목 드래그 앤 드롭 이동 시, 선택된 체크박스 상태가 초기화되지 않고 동기화 저장되도록 개선 (`data-checked` DOM 속성 연동).</li>
                                 <li><strong>무해한 외부 스크립트 에러 팝업 제거:</strong> 사파리 광고차단/번역 확장 기능 등의 에러가 감지되어 경고창(`alert`)이 뜨지 않도록 처리.</li>
+                                <li><strong>iOS 드래그 앤 드롭 동작 안정성 향상:</strong> 터치 드래그 중 스크롤 충돌로 드래그가 취소(`pointercancel`)될 때 정리 작업 누락으로 복사본이 화면에 굳던 버그 수정 및 드래그 중 전체 터치 스크롤 차단(`touch-action: none`) 적용.</li>
                             </ul>
                         </div>
                     </div>
@@ -1359,6 +1361,7 @@
             const onUp = () => {
                 document.removeEventListener('pointermove', onMove);
                 document.removeEventListener('pointerup', onUp);
+                document.removeEventListener('pointercancel', onUp);
                 ghost.remove();
                 row.classList.remove('dragging');
                 document.body.classList.remove('is-sorting');
@@ -1368,6 +1371,7 @@
 
             document.addEventListener('pointermove', onMove);
             document.addEventListener('pointerup', onUp);
+            document.addEventListener('pointercancel', onUp);
         }
 
         // Save custom category and items layout order to safeStorage
