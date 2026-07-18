@@ -1366,7 +1366,9 @@
                     } else if (child.classList.contains('checklist-item')) {
                         const itemInput = child.querySelector('.item-input');
                         const itemText = itemInput ? itemInput.value : child.getAttribute('data-text');
-                        order.items[categoryName].push({ type: 'item', text: itemText });
+                        const checkbox = child.querySelector('input[type="checkbox"]');
+                        const isChecked = checkbox ? checkbox.checked : false;
+                        order.items[categoryName].push({ type: 'item', text: itemText, checked: isChecked });
                     }
                 }
             });
