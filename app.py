@@ -175,6 +175,18 @@ def main():
         * **이미지로 저장 (JPG):** `📸 이미지로 저장` 단추를 누르면 내가 체크한 항목과 진행률(선택 항목 비율)이 담긴 고해상도 JPG 이미지 카드를 다운로드할 수 있어, 오프라인이나 락페 현장에서 사진첩으로 빠르게 볼 수 있습니다.
         * **초기화:** 리스트 상태를 완전히 처음 기본값으로 되돌리고 싶을 때 사용합니다.
         """)
+        
+        # Collapsible Changelog expander
+        with st.expander("🆕 업데이트 내역 (Changelog)"):
+            try:
+                with open("CHANGELOG.md", "r", encoding="utf-8") as f:
+                    changelog_content = f.read()
+                # Remove header lines for cleaner sidebar rendering
+                if "---" in changelog_content:
+                    changelog_content = changelog_content.split("---", 1)[1].strip()
+                st.markdown(changelog_content)
+            except Exception:
+                st.write("업데이트 내역을 불러올 수 없습니다.")
     
     # Inject JavaScript to localize the Streamlit menu and settings modal into Korean, and hide Development options
     components.html("""
