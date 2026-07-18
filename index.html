@@ -1367,7 +1367,7 @@
                         const itemInput = child.querySelector('.item-input');
                         const itemText = itemInput ? itemInput.value : child.getAttribute('data-text');
                         const checkbox = child.querySelector('input[type="checkbox"]');
-                        const isChecked = checkbox ? checkbox.checked : false;
+                        const isChecked = checkbox ? checkbox.checked : (child.getAttribute('data-checked') === 'true');
                         order.items[categoryName].push({ type: 'item', text: itemText, checked: isChecked });
                     }
                 }
@@ -1737,6 +1737,7 @@
                         const label = document.createElement('div');
                         label.className = 'checklist-item';
                         label.setAttribute('data-text', node.text);
+                        label.setAttribute('data-checked', node.checked ? 'true' : 'false');
                         if (activeSubheader) {
                             label.style.paddingLeft = '15px'; // Indent grouped items
                         }
@@ -1759,13 +1760,17 @@
                         const checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
                         checkbox.checked = !!node.checked;
-                        checkbox.addEventListener('change', () => toggleItem(category, itemIndex, checkbox.checked));
+                        checkbox.addEventListener('change', () => {
+                            label.setAttribute('data-checked', checkbox.checked ? 'true' : 'false');
+                            toggleItem(category, itemIndex, checkbox.checked);
+                        });
 
                         const checkmark = document.createElement('span');
                         checkmark.className = 'checkmark';
                         checkmark.style.cursor = 'pointer';
                         checkmark.addEventListener('click', () => {
                             checkbox.checked = !checkbox.checked;
+                            label.setAttribute('data-checked', checkbox.checked ? 'true' : 'false');
                             toggleItem(category, itemIndex, checkbox.checked);
                         });
 
@@ -1805,6 +1810,7 @@
                             text.style.cursor = 'pointer';
                             text.addEventListener('click', () => {
                                 checkbox.checked = !checkbox.checked;
+                                label.setAttribute('data-checked', checkbox.checked ? 'true' : 'false');
                                 toggleItem(category, itemIndex, checkbox.checked);
                             });
 
