@@ -724,7 +724,7 @@
                             d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
                     </svg>@sigong
                 </a>
-                &copy; 2026 | Inspired by c86tori | <a href="#" onclick="openChangelogModal(event)" style="color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer;">v1.3.0</a>
+                &copy; 2026 | Inspired by c86tori | <a href="#" onclick="openChangelogModal(event)" style="color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer;">v1.4.0</a>
             </p>
         </footer>
     </div>
@@ -815,39 +815,66 @@
                 <button class="modal-close-btn" onclick="closeChangelogModal(null)">&times;</button>
             </div>
             <div class="modal-body" style="max-height: 65vh; overflow-y: auto; padding-right: 5px; text-align: left;">
-                <!-- v1.3.0 -->
+                <!-- v1.4.0 -->
                 <div class="changelog-version-block" style="margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                        <span style="font-size: 1.3rem; font-weight: 700; color: var(--primary);">v1.3.0</span>
-                        <span style="font-size: 0.85rem; color: var(--text-sub);">2026-07-17</span>
+                        <span style="font-size: 1.3rem; font-weight: 700; color: var(--primary);">v1.4.0</span>
+                        <span style="font-size: 0.85rem; color: var(--text-sub);">2026-07-19</span>
                         <span style="background: rgba(255, 138, 0, 0.15); color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(255,138,0,0.3);">Latest</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 15px;">
                         <div>
                             <span class="changelog-badge badge-added">Added</span>
                             <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-sub); font-size: 0.92rem; line-height: 1.5; list-style-type: disc;">
-                                <li><strong>iOS 및 모바일 사진첩 직접 저장 기능(Web Share API):</strong> 이미지 저장 시 공유창이 바로 팝업되어 네이티브 사진첩 저장 지원. 카카오톡/인스타그램 웹뷰 전용 이중 이미지 보기 꾹누르기 저장 모달 백업 탑재.</li>
-                                <li><strong>체크리스트 사용 설명 가이드 탑재:</strong> 기본 체크, 커스터마이징 드래그, 이미지 저장 설명 등이 들어있는 도움말 팝업 연동.</li>
-                                <li><strong>iOS 홈 화면 추가 최적화:</strong> 홈 화면에 추가할 때 표시되는 전용 앱 아이콘 제작 및 잘림 없는 '후지록' 전용 이름 반영.</li>
-                                <li><strong>해외여행 필수품 리스트 추가:</strong> 여권, 항공권, 여행자보험, 일본 교통카드, eSIM, 엔화 현금 항목 개설.</li>
-                                <li><strong>기타 유용한 준비물 보강:</strong> 물티슈, 쿨링티슈, 이어플러그, 방수팩, 지퍼백, 벌레약, 립밤, 상처연고, 방수테이프 추가.</li>
-                                <li><strong>체크리스트 캐시 자동 병합:</strong> 준비물 대량 추가/이동 시 기존 사용자 브라우저 체크 상태를 안전하게 병합하는 마이그레이터 반영.</li>
+                                <li><strong>iOS 홈 화면 추가 아이콘 및 웹 앱 설정 반영:</strong> 아이폰 사파리에서 '홈 화면에 추가'할 시 깔끔하게 노출되는 고해상도 전용 디자인 앱 아이콘(`apple-touch-icon.png`, `favicon.png`) 제작/이식 및 앱 이름이 잘리지 않도록 모바일 웹 앱 타이틀 속성(`후지록`) 지정.</li>
+                                <li><strong>대화형 업데이트 내역(Changelog) 조회 모달 추가:</strong> 하단 버전 정보 태그 클릭 및 도움말 내 링크를 통해 최근 업데이트 내역을 색상 배지와 함께 편리하게 볼 수 있는 팝업 모달 추가.</li>
+                                <li><strong>Streamlit 가이드 사이드바 업데이트 연동:</strong> 파이썬 Streamlit 앱 사이드바에도 `CHANGELOG.md` 마크다운을 실시간 동적 렌더링하는 접이식 아코디언 메뉴 탑재.</li>
+                                <li><strong>타이틀 하단 영문 서브타이틀 추가:</strong> 메인 배너 타이틀 하단 및 이미지 저장 결과물에 영문 **'CHECKLIST'** 라벨 추가하여 디자인성 향상.</li>
                             </ul>
                         </div>
                         <div>
                             <span class="changelog-badge badge-changed">Changed</span>
                             <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-sub); font-size: 0.92rem; line-height: 1.5; list-style-type: disc;">
-                                <li><strong>카테고리 구성 직관화:</strong> 준비물 항목들을 '[공통]', '[숙소 이용자용] 캐리어', '[캠핑/차박용]' 카테고리로 재구획.</li>
-                                <li><strong>레이아웃 시인성 및 반응형 글자 크기 보완:</strong> 배너 글씨 뒤 그림자 및 오버레이 강화, 모바일 크기 반응형 clamp 글자 조절.</li>
-                                <li><strong>준비물 명칭 변경 및 위치 개선:</strong> 타임테이블 &rarr; <strong>후지락앱</strong>, 햇 (모자) &rarr; <strong>모자</strong>, 플리스 &rarr; <strong>바람막이</strong>, 판초 우의(파랑) &rarr; <strong>판초 우의</strong> 개칭 및 캐시 자동 매핑. 맥주 너클 오프너를 배낭 하위로 이동, 중요 소지품을 당일 챙길 것 카테고리로 상향.</li>
-                                <li><strong>스크롤 및 외부 에러 팝업 제거:</strong> 모달 오픈 시 배경 휠 잠금, 닫기 버튼 추가. 타사 광고 차단 앱 등 외부 스크립트 오작동 시 알림창이 뜨지 않도록 처리.</li>
-                                <li><strong>정렬 시 체크 상태 유지:</strong> 준비물 드래그 앤 드롭 이동 시, 선택된 체크박스 상태가 초기화되지 않고 동기화 저장되도록 개선.</li>
+                                <li><strong>드래그 정렬 시 체크 상태 유지:</strong> 일반 모드 및 편집 모드 전체에서 준비물 항목 드래그 앤 드롭 이동 시, 선택된 체크박스 상태가 초기화되지 않고 동기화 저장되도록 개선 (`data-checked` DOM 속성 연동).</li>
+                                <li><strong>무해한 외부 스크립트 에러 팝업 제거:</strong> 사파리 광고차단/번역 확장 기능 등의 에러가 감지되어 경고창(`alert`)이 뜨지 않도록 처리.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- v1.3.0 -->
+                <div class="changelog-version-block" style="margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-main);">v1.3.0</span>
+                        <span style="font-size: 0.85rem; color: var(--text-sub);">2026-07-17</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <span class="changelog-badge badge-added">Added</span>
+                            <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-sub); font-size: 0.92rem; line-height: 1.5; list-style-type: disc;">
+                                <li><strong>iOS 및 모바일 사진 앱 직접 저장 기능(Web Share API) 도입:</strong> 아이폰 및 모바일 브라우저에서 '이미지로 저장' 시 iOS 공유 시트가 바로 팝업되어 사용자 제스처 한 번으로 **'이미지 저장'을 눌러 사진(갤러리) 앱에 즉시 직접 저장**할 수 있도록 네이티브 공유 API 연동 및 카카오톡/인스타그램 등의 차단 환경을 위한 미리보기 꾹 누르기 모달(Fallback) 이중 구현.</li>
+                                <li><strong>후지록 체크리스트 사용 가이드 추가:</strong> 기본 체크 기능, 정렬/배너 커스터마이징, 이미지 다운로드 팁 등이 포함된 인터랙티브 도움말(도움말 모달 팝업 & Streamlit 사이드바) 기능 추가.</li>
+                                <li><strong>해외여행 필수품 추가:</strong> 여권, 항공권, 여행자보험, 해외결제·외화카드, 일본 교통카드, eSIM, 엔화 현금 항목 추가 (`당일 챙길 것`, `숙소 배낭` 내 세분화 배치).</li>
+                                <li><strong>위생 및 비상용품 보강:</strong> 물티슈, 쿨링티슈, 이어플러그, 휴대폰 방수팩, 지퍼백, 벌레 물린 약, 립밤, 상처 연고, 방수테이프 추가.</li>
+                                <li><strong>캐시 자동 마이그레이션:</strong> 리스트 항목 대폭 추가 시, 기존 사용자 브라우저의 저장 데이터(`localStorage`)와 새로운 기본 준비물을 안전하게 병합(Merge)해주는 복구 로직 탑재.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <span class="changelog-badge badge-changed">Changed</span>
+                            <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-sub); font-size: 0.92rem; line-height: 1.5; list-style-type: disc;">
+                                <li><strong>카테고리 분류 개편:</strong> 준비물을 '[공통]', '[숙소 이용자용] 캐리어', '[캠핑/차박용]' 카테고리로 직관적으로 분리 개편 및 기존 사용자 캐시 자동 매핑.</li>
+                                <li><strong>텍스트 가독성 및 모바일 레이아웃 개선:</strong> 배너 배경 위 텍스트가 묻히지 않도록 검은색 오버레이 투명도를 높이고 (`0.45` $\rightarrow$ `0.6`), 그라데이션 타이틀 뒤에 그림자 효과 (`filter: drop-shadow`) 적용. 아이폰 15 등 모바일 세로 모드에서 메인 타이틀이 줄 바꿈 되어 잘리는 현상을 방지하기 위해 가변 반응형 폰트 크기(`clamp()`) 및 간격 조절 적용. PC 및 웹 환경에서 도움말 모달이 아래로 치우쳐 잘리는 flex overflow 버그 수정, 모달 엘리먼트 body 직속 배치로 fixed 컨텍스트 보장, 모달 노출 시 뒷배경 스크롤 잠금(body overflow: hidden) 및 모달 자체 스크롤 상단 리셋(scrollTop = 0) 적용.</li>
+                                <li><strong>안내 및 출력 라벨 명칭 변경:</strong> 정렬 안내 문구를 "손잡이로 드래그하여 정렬, 탭으로 확인"에서 **"마우스로 드래그 하여 항목 위치 변경 가능, 탭으로 확인"**으로 직관적으로 수정하고, 다운로드 이미지 하단의 진행률 라벨 텍스트를 `진행률`에서 **`선택 항목`**으로 수정. 도움말 모달 및 이미지 저장 모달 하단에 모바일 접근성 향상을 위한 **`닫기`** 버튼 배치.</li>
+                                <li><strong>중요 소지품 위치 이동:</strong> 분실 위험 방지를 위해 `주차권`, `손목밴드 (입장권)`, `타임테이블`을 '차에 두고 갈 것' &rarr; <strong>'당일 챙길 것'</strong>으로 카테고리 상향 이동.</li>
+                                <li><strong>푸터 서명 인스타그램 링크 연결:</strong> 만든이 '@sigong' 영역에 인스타그램 프로필 링크(`https://www.instagram.com/sigong`) 및 SVG 로고 아이콘 추가.</li>
+                                <li><strong>준비물 명칭 및 위치 변경:</strong> '판초 우의 (파랑)' &rarr; <strong>'판초 우의'</strong>, '플리스' &rarr; <strong>'바람막이'</strong>, '타임테이블' &rarr; <strong>'후지락앱'</strong>, '햇 (모자)' &rarr; <strong>'모자'</strong>로 명칭 변경. '내용물' &rarr; <strong>'배낭'</strong>으로 소제목 수정 및 <strong>'맥주 너클 오프너'</strong>를 배낭 하위로 이동 (기존 캐시 자동 치환).</li>
                             </ul>
                         </div>
                         <div>
                             <span class="changelog-badge badge-removed">Removed</span>
                             <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-sub); font-size: 0.92rem; line-height: 1.5; list-style-type: disc;">
-                                <li>불필요한 중복 소지품 항목 제거 (건강보험증, 집 열쇠, 페이스 시트, 해외결제 가능 신용카드 항목 등).</li>
+                                <li>헤더 영역의 서브타이틀 텍스트("후지록 페스티벌 준비물 체크리스트로 완벽한 축제를 준비하세요!") 삭제.</li>
+                                <li>준비물 리스트에서 불필요한 <strong>건강보험증</strong>, <strong>집 열쇠</strong>, <strong>페이스 시트</strong> 및 <strong>해외결제 가능 신용카드</strong> (해외결제·외화카드) 항목 삭제. (기존 사용자 기기에서도 새로고침 시 자동 제거됨)</li>
                             </ul>
                         </div>
                     </div>
@@ -2180,7 +2207,7 @@
             ctx.fillStyle = '#505060';
             ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('만든이 @sigong © 2026 | Inspired by c86tori | v1.3.0', canvas.width / 2, canvas.height - 40);
+            ctx.fillText('만든이 @sigong © 2026 | Inspired by c86tori | v1.4.0', canvas.width / 2, canvas.height - 40);
 
             // Download trigger & Preview Modal popup
             try {
