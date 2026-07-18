@@ -779,9 +779,9 @@
     </div>
 
     <script>
-        // Global Error Logger for webview debugging
+        // Global Error Logger (Logs quietly to console, ignores third-party script errors from alerts)
         window.onerror = function (message, source, lineno, colno, error) {
-            alert("JS Error: " + message + "\nLine: " + lineno + "\nSource: " + source);
+            console.error("JS Error:", message, "Line:", lineno, "Source:", source);
             return false;
         };
 
