@@ -725,7 +725,7 @@
                             d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
                     </svg>@sigong
                 </a>
-                &copy; 2026 | Inspired by c86tori | <a href="#" onclick="openChangelogModal(event)" style="color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer;">v1.4.0</a>
+                &copy; 2026 | Inspired by c86tori | <a href="#" onclick="openChangelogModal(event)" style="color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer;">v1.4.1</a>
             </p>
         </footer>
     </div>
@@ -816,12 +816,34 @@
                 <button class="modal-close-btn" onclick="closeChangelogModal(null)">&times;</button>
             </div>
             <div class="modal-body" style="max-height: 65vh; overflow-y: auto; padding-right: 5px; text-align: left;">
+                <!-- v1.4.1 -->
+                <div class="changelog-version-block" style="margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <span style="font-size: 1.3rem; font-weight: 700; color: var(--primary);">v1.4.1</span>
+                        <span style="font-size: 0.85rem; color: var(--text-sub);">2026-07-19</span>
+                        <span style="background: rgba(255, 138, 0, 0.15); color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(255,138,0,0.3);">Latest</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <span class="changelog-badge badge-added">Added</span>
+                            <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-sub); font-size: 0.92rem; line-height: 1.5; list-style-type: disc;">
+                                <li><strong>캠핑/야영 준비물 추가:</strong> <code>[캠핑/차박용] 야영 및 차량 보관</code> 카테고리에 대규모 캠핑 사이트 내 텐트 위치 확인을 위한 <strong>에어태그 (텐트 찾기용)</strong> 항목 추가.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <span class="changelog-badge badge-changed">Fixed</span>
+                            <ul style="margin: 8px 0 0 18px; padding: 0; color: var(--text-sub); font-size: 0.92rem; line-height: 1.5; list-style-type: disc;">
+                                <li><strong>iOS 드래그 앤 드롭 동작 안정성 향상:</strong> 터치 드래그 중 스크롤 충돌로 드래그가 취소(<code>pointercancel</code>)될 때 정리 작업 누락으로 복사본이 화면에 굳던 버그 수정 및 드래그 중 전체 터치 스크롤 차단(<code>touch-action: none</code>) 적용.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- v1.4.0 -->
                 <div class="changelog-version-block" style="margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                        <span style="font-size: 1.3rem; font-weight: 700; color: var(--primary);">v1.4.0</span>
+                        <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-main);">v1.4.0</span>
                         <span style="font-size: 0.85rem; color: var(--text-sub);">2026-07-19</span>
-                        <span style="background: rgba(255, 138, 0, 0.15); color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(255,138,0,0.3);">Latest</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 15px;">
                         <div>
@@ -1010,7 +1032,7 @@
                 "[빨래 용품]": ["세탁세제", "세탁망", "접이식 옷걸이"]
             },
             "[캠핑/차박용] 야영 및 차량 보관": {
-                "": ["에어매트", "미니 아이스박스", "접이식 우산", "돗자리", "손선풍기"],
+                "": ["에어매트", "미니 아이스박스", "접이식 우산", "돗자리", "손선풍기", "에어태그 (텐트 찾기용)"],
                 "[차박 박스]": ["바디 시트", "취침용 T셔츠", "속옷 (2장)", "양말 (1켤레)", "복귀용 여분 옷", "비닐봉지 (여분)", "2일차 수건", "3일차 수건", "막 쓰는 수건", "2일차 손수건 (빨아서 쓰기)", "모자 (캡)", "이어플러그"],
                 "[기타 박스]": ["장화", "샌들", "차량용 햇빛 가리개", "주방세제", "수세미", "일회용 장갑", "네임펜"],
                 "[노란 배낭]": ["접이식 의자 (대)"]
@@ -1163,9 +1185,14 @@
                             if (subheader) {
                                 targetIdx = order.items[category].findIndex(n => n.type === 'subheader' && n.text === subheader) + 1;
                                 if (targetIdx === 0) targetIdx = order.items[category].length;
+                            } else {
+                                const firstSubheaderIdx = order.items[category].findIndex(n => n.type === 'subheader');
+                                targetIdx = firstSubheaderIdx === -1 ? order.items[category].length : firstSubheaderIdx;
                             }
                             defaultItems.forEach(item => {
-                                if (!existingTexts.has(item)) {
+                                const altItem = item.includes(' ') ? item.replace(/\s+/g, '') : item;
+                                const alreadyExists = existingTexts.has(item) || (altItem !== item && existingTexts.has(altItem));
+                                if (!alreadyExists) {
                                     order.items[category].splice(targetIdx, 0, { type: 'item', text: item, checked: false });
                                     existingTexts.add(item);
                                     targetIdx++;
@@ -2211,7 +2238,7 @@
             ctx.fillStyle = '#505060';
             ctx.font = '20px "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('만든이 @sigong © 2026 | Inspired by c86tori | v1.4.0', canvas.width / 2, canvas.height - 40);
+            ctx.fillText('만든이 @sigong © 2026 | Inspired by c86tori | v1.4.1', canvas.width / 2, canvas.height - 40);
 
             // Download trigger & Preview Modal popup
             try {
